@@ -75,18 +75,6 @@ export default function Home() {
                 </form>
             </div>
 
-            <div className="mt-8 text-center pb-8 border-b border-gray-100">
-                <p className="text-sm font-semibold text-gray-400 mb-4 uppercase tracking-widest">Supports 85+ Global Carriers</p>
-                <div className="flex flex-wrap justify-center items-center gap-6 opacity-80 grayscale hover:grayscale-0 transition-all duration-500">
-                    <span className="text-2xl font-black italic text-[#d40511] bg-[#ffcc00] px-2 -skew-x-12">DHL</span>
-                    <span className="text-2xl font-black text-[#5e2d1d] italic">UPS</span>
-                    <span className="text-2xl font-bold"><span className="text-[#4D148C]">Fed</span><span className="text-[#FF6600]">Ex</span></span>
-                    <span className="text-2xl font-bold text-[#333366] tracking-tighter">USPS</span>
-                    <span className="text-xl font-bold text-[#D21F1C]">Royal Mail</span>
-                    <span className="text-xl font-bold text-slate-800">CHINA POST</span>
-                </div>
-            </div>
-
             <BuyCredits />
         </div>
     );

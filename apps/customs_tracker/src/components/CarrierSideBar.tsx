@@ -1,8 +1,8 @@
 export default function CarrierSideBar() {
     return (
         <aside className="hidden xl:flex fixed right-0 top-1/2 -translate-y-1/2 flex-col gap-6 p-6 bg-white/80 backdrop-blur-sm border-l border-gray-100 shadow-sm rounded-l-2xl z-10">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest vertical-rl rotate-180 text-center py-2 border-l border-gray-200 ml-2">
-                Supported Carriers
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center py-2 border-b border-gray-200 mb-2">
+                Supported<br />Carriers
             </p>
 
             <div className="flex flex-col gap-6 opacity-70 hover:opacity-100 transition-opacity items-center">
