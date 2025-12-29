@@ -11,6 +11,7 @@ const PACKS = [
         perSearch: "$0.10",
         icon: Truck,
         benefits: [
+            "🎁 +1 Free Bonus Search",
             "50 Deep Tracking Scans",
             "Basic AI Risk Assessment",
             "Standard Support"
@@ -27,6 +28,7 @@ const PACKS = [
         perSearch: "$0.075",
         icon: Zap,
         benefits: [
+            "🎁 +2 Free Bonus Searches",
             "200 Deep Tracking Scans",
             "⚡ Priority Processing",
             "📲 Telegram Alerts Included",
@@ -44,6 +46,7 @@ const PACKS = [
         perSearch: "$0.06",
         icon: Shield,
         benefits: [
+            "🎁 +3 Free Bonus Searches",
             "500 Deep Tracking Scans",
             "📊 Bulk CSV Import",
             "📄 Export Official PDFs",
