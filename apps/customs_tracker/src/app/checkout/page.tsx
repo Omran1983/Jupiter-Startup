@@ -48,15 +48,15 @@ function CheckoutContent() {
                 <div className="p-4 border border-blue-100 bg-blue-50 rounded-lg">
                     <p className="text-sm font-bold text-blue-800 mb-2 text-left">Option 1: PayPal (Instant)</p>
                     <a
-                        href="https://paypal.me/UseYourManualHandleHere"
+                        href={`https://paypal.me/omranahmad/${pack?.price?.replace('$', '') || '5'}USD`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="block w-full bg-[#0070BA] text-white font-bold py-3 rounded-lg hover:bg-[#005ea6] transition-colors"
                     >
-                        Pay with PayPal
+                        Pay {pack?.price} with PayPal
                     </a>
                     <p className="text-xs text-blue-600 mt-2 text-left">
-                        *Instant Credit Activation
+                        *Instant Credit Activation. Link auto-fills amount.
                     </p>
                 </div>
 
