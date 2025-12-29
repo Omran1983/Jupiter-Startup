@@ -7,6 +7,7 @@ export const CustomsRunInputSchema = z.object({
     destinationCountry: z.string().min(2).max(2), // ISO2 recommended
     orderValue: z.number().nonnegative().optional(),
     currency: z.string().min(3).max(3).optional(),
+    telegramChatId: z.string().optional(), // Optional: Override for specific notifications
 });
 
 export type CustomsRunInput = z.infer<typeof CustomsRunInputSchema>;
