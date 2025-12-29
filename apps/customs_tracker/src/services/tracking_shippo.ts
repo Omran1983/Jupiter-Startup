@@ -42,7 +42,7 @@ export class ShippoTrackingService implements ITrackingService {
             else {
                 // Check for specific "Customs" keywords in the history or status details
                 // This is where our "Value Add" logic kicks in
-                const historyDetails = track.tracking_history?.map(h => h.status_details?.toLowerCase() || "").join(" ") || "";
+                const historyDetails = track.tracking_history?.map((h: any) => h.status_details?.toLowerCase() || "").join(" ") || "";
                 const statusDetails = track.tracking_status.status_details?.toLowerCase() || "";
 
                 if (
