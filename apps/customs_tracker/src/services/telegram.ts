@@ -6,10 +6,10 @@ import TelegramBot from 'node-telegram-bot-api';
 export class TelegramService {
     private bot: TelegramBot | null = null;
 
-    constructor() {
-        const token = process.env.TELEGRAM_BOT_TOKEN;
-        if (token) {
-            this.bot = new TelegramBot(token, { polling: false }); // We only send, don't poll in this serverless context usually
+    constructor(token?: string) {
+        const botToken = token || process.env.TELEGRAM_BOT_TOKEN;
+        if (botToken) {
+            this.bot = new TelegramBot(botToken, { polling: false });
         }
     }
 

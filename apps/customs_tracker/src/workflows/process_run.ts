@@ -38,6 +38,26 @@ export async function processRun(context: RunContext) {
         generatedAt: new Date().toISOString(),
     };
 
+    // 4.5 Send Telegram Alert (If configured and critical)
+    try {
+        if (analysis.riskAssessment.level === "CRITICAL" || analysis.riskAssessment.level === "HIGH" || trackResult.status === "customs_hold") {
+            const { TelegramService } = await import("../services/telegram");
+            const telegram = new TelegramService();
+
+            // Note: In a real app, we need the User's ChatID. 
+            // For now, we Alert the ADMIN (Omran) or use a provided ChatID in input.
+            const targetChatId = context.input.telegramChatId || process.env.ADMIN_TELEGRAM_CHAT_ID;
+
+            if (targetChatId) {
+                const icon = analysis.riskAssessment.level === "CRITICAL" ? "🚨" : "⚠️";
+                const msg = `${icon} *Customs Alert*\n\nPackage: \`${trackingNumber}\`\nStatus: *${analysis.consumerStatus}*\nRisk: ${analysis.riskAssessment.level} (${analysis.riskAssessment.score}/100)\n\n_Check Dashboard for details._`;
+                await telegram.sendAlert(targetChatId, msg);
+            }
+        }
+    } catch (err) {
+        console.error("Failed to send telegram alert:", err);
+    }
+
     // 5. Persist to DB (If Supabase is configued)
     if (supabase) {
         // We use the ID passed in, or generate one if strictly DB generated
