@@ -1,3 +1,4 @@
+
 import { TrackingResult } from "./tracking";
 import { CustomsRiskCalculator, RiskAssessment } from "./risk_score";
 
@@ -37,7 +38,7 @@ export class CustomsAnalyzer {
                 emailTemplate: {
                     subject: "Urgent: Customs requires Commercial Invoice for Order #[Order ID]",
                     body: `Hi [Seller Name],\n\nI am contacting you regarding my order #[Order ID] (Tracking: ${result.trackingNumber}).\n\nThe carrier has flagged that the shipment is HELD at customs due to a missing or incorrect Commercial Invoice.\n\nPlease provide the invoice to the carrier immediately so the package can be released. If this is not resolved by [Date], I will have to request a refund.\n\nPlease confirm when this is done.\n\nThanks,\n[My Name]`
-                }
+                },
                 riskAssessment
             };
         }
@@ -57,7 +58,7 @@ export class CustomsAnalyzer {
                 emailTemplate: {
                     subject: "Refund Request: Order #[Order ID] Seized by Customs",
                     body: `Hi [Seller Name],\n\nMy order (Tracking: ${result.trackingNumber}) has been marked as SEIZED/PROHIBITED by customs.\n\nSince I cannot receive this item, I am requesting a full refund immediately.\n\nPlease process this refund within 24 hours.\n\nRegards,\n[My Name]`
-                }
+                },
                 riskAssessment
             };
         }
@@ -77,7 +78,7 @@ export class CustomsAnalyzer {
                 emailTemplate: {
                     subject: "Inquiry: Status of Order #[Order ID]",
                     body: `Hi [Seller Name],\n\nI noticed my order (Tracking: ${result.trackingNumber}) has been stuck in 'Customs Clearance' for several days.\n\nIs there any documentation required from my side? Or do I just need to wait?\n\nI would appreciate a check on your end.\n\nThanks,\n[My Name]`
-                }
+                },
                 riskAssessment
             };
         }
@@ -106,6 +107,7 @@ export class CustomsAnalyzer {
             actionItems: ["No action needed. moving normally."],
             refundAdvice: "Do not refund. Package is moving.",
             emailTemplate: undefined,
+            riskAssessment
         };
     }
 }
