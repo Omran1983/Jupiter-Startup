@@ -10,9 +10,14 @@ const PACKS = [
         credits: 50,
         perSearch: "$0.10",
         icon: Truck,
+        benefits: [
+            "50 Deep Tracking Scans",
+            "Basic AI Risk Assessment",
+            "Standard Support"
+        ],
         color: "bg-blue-50 text-blue-700 border-blue-200",
         btnColor: "bg-blue-600 hover:bg-blue-700",
-        link: "#PAYPAL_LINK_5" // User to replace
+        link: "#PAYPAL_LINK_5"
     },
     {
         id: "power",
@@ -20,9 +25,14 @@ const PACKS = [
         price: "$15.00",
         credits: 200,
         perSearch: "$0.075",
-        features: ["Best Value", "Priority Alerts"],
         icon: Zap,
-        color: "bg-purple-50 text-purple-700 border-purple-200 ring-2 ring-purple-500", // Highlight
+        benefits: [
+            "200 Deep Tracking Scans",
+            "⚡ Priority Processing",
+            "📲 Telegram Alerts Included",
+            "Save 25% vs Starter"
+        ],
+        color: "bg-purple-50 text-purple-700 border-purple-200 ring-2 ring-purple-500",
         btnColor: "bg-purple-600 hover:bg-purple-700",
         link: "#PAYPAL_LINK_15"
     },
@@ -33,6 +43,12 @@ const PACKS = [
         credits: 500,
         perSearch: "$0.06",
         icon: Shield,
+        benefits: [
+            "500 Deep Tracking Scans",
+            "📊 Bulk CSV Import",
+            "📄 Export Official PDFs",
+            "Save 40% vs Starter"
+        ],
         color: "bg-emerald-50 text-emerald-700 border-emerald-200",
         btnColor: "bg-emerald-600 hover:bg-emerald-700",
         link: "#PAYPAL_LINK_30"
@@ -64,6 +80,15 @@ export function BuyCredits() {
                             <h4 className="font-bold text-lg">{pack.name}</h4>
                             <div className="text-3xl font-black my-2">{pack.credits} <span className="text-sm font-normal opacity-70">credits</span></div>
                         </div>
+
+                        <ul className="mb-6 space-y-2 flex-1">
+                            {pack.benefits.map((feature, i) => (
+                                <li key={i} className="text-sm flex items-start gap-2">
+                                    <span className="opacity-70">✓</span>
+                                    <span className="font-medium opacity-90">{feature}</span>
+                                </li>
+                            ))}
+                        </ul>
 
                         <a
                             href={pack.link}
