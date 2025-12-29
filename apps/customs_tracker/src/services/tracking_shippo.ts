@@ -1,81 +1,88 @@
-// @ts-ignore
-import shippo from "shippo";
+
 import { ITrackingService, TrackingResult } from "./tracking";
 
-// Initialize Shippo with the Test Token (or Live Token from env)
-// In production, use process.env.SHIPPO_API_KEY
-const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
-const client = (shippo as any)(SHIPPO_TOKEN);
-
 export class ShippoTrackingService implements ITrackingService {
+
+    // Lazy Client Initializer to prevent Build-Time Crashes
+    private getClient() {
+        const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
+
+        // Dynamic Require to bypass Next.js Bundler aggressive pre-eval check for top-level vars
+        const shippoPkg = require("shippo");
+
+        // Handle strange bundling states (ESM vs CJS)
+        // If shippoPkg is a function, use it. If it has .default, use that.
+        const initShippo = typeof shippoPkg === 'function' ? shippoPkg : shippoPkg.default;
+
+        if (!initShippo || typeof initShippo !== 'function') {
+            // Fallback for extreme cases
+            if (shippoPkg && typeof shippoPkg.Client === 'function') return new shippoPkg.Client(SHIPPO_TOKEN);
+
+            console.error("[Shippo Init Error] Package Content:", shippoPkg);
+            throw new Error("Shippo library could not be initialized. Check console.");
+        }
+
+        return initShippo(SHIPPO_TOKEN);
+    }
+
     async getStatus(carrier: string, trackingNumber: string): Promise<TrackingResult> {
         try {
-            console.log(`[Shippo] Fetching status for ${carrier} - ${trackingNumber}`);
+            console.log(`[Shippo] Tracking ${carrier} ${trackingNumber}`);
 
-            // Shippo's "get_status" is usually for their transactions. 
-            // For external tracking, we use the "tracks" endpoint.
-            // We map our simplified carrier codes to Shippo's.
-            // Common codes: "usps", "shippo", "dhl_express", "fedex", "ups"
-            const carrierMap: Record<string, string> = {
-                "dhl": "dhl_express",
-                "fedex": "fedex",
-                "ups": "ups",
-                "usps": "usps"
-            };
+            // Init client ONLY when needed (Runtime)
+            const client = this.getClient();
+            const track = await client.track.get_status(carrier, trackingNumber);
 
-            const shippoCarrier = carrierMap[carrier.toLowerCase()] || carrier.toLowerCase();
-
-            // Fetch tracking info
-            const track = await client.track.get_status(shippoCarrier, trackingNumber);
-
-            if (!track || !track.tracking_status) {
-                throw new Error("Invalid tracking data received from carrier.");
+            if (!track || !track.tracking_history) {
+                // Return basic info if no history found
+                return {
+                    trackingNumber,
+                    status: "Status Unavailable",
+                    statusDetails: "Carrier has no data yet.",
+                    carrier,
+                    eta: "Unknown",
+                    location: "Unknown",
+                    history: []
+                };
             }
 
-            // Map Shippo Status to Our Internal Status
-            // Shippo: PRE_TRANSIT, TRANSIT, DELIVERED, RETURNED, FAILURE, UNKNOWN
-            let status: "pre_transit" | "transit" | "customs_hold" | "delivered" | "exception" = "transit";
-            const s = track.tracking_status.status;
+            // Map History safely with explicit types
+            const history = track.tracking_history.map((h: any) => ({
+                status: h.status || "Unknown",
+                details: h.status_details || "",
+                location: h.location ? `${h.location.city || ''}, ${h.location.country || ''}` : "Unknown",
+                timestamp: h.status_date || new Date().toISOString()
+            }));
 
-            if (s === "PRE_TRANSIT") status = "pre_transit";
-            else if (s === "DELIVERED") status = "delivered";
-            else if (s === "RETURNED" || s === "FAILURE") status = "exception";
-            else {
-                // Check for specific "Customs" keywords in the history or status details
-                // This is where our "Value Add" logic kicks in
-                const historyDetails = track.tracking_history?.map((h: any) => h.status_details?.toLowerCase() || "").join(" ") || "";
-                const statusDetails = track.tracking_status.status_details?.toLowerCase() || "";
+            // Get latest status
+            const latest = history.length > 0 ? history[0] : null;
 
-                if (
-                    statusDetails.includes("customs") ||
-                    statusDetails.includes("clearance") ||
-                    statusDetails.includes("held") ||
-                    historyDetails.includes("held in customs")
-                ) {
-                    status = "customs_hold";
-                }
-            }
+            // Build Context String
+            // We join all status details to analyze the "mood" of the shipment
+            const historyDetails = track.tracking_history?.map((h: any) => h.status_details?.toLowerCase() || "").join(" ") || "";
 
             return {
-                carrier: carrier,
-                trackingNumber: trackingNumber,
-                status: status,
-                rawStatus: track.tracking_status.status_details || track.tracking_status.status,
-                location: track.tracking_status.location ? `${track.tracking_status.location.city}, ${track.tracking_status.location.country}` : undefined,
-                lastUpdated: track.tracking_status.status_date || new Date().toISOString(),
-                estimatedDelivery: track.eta,
-                history: track.tracking_history?.map((h: any) => ({
-                    date: h.status_date,
-                    status: h.status,
-                    details: h.status_details
-                })) || []
+                trackingNumber,
+                status: latest?.status || "Unknown",
+                statusDetails: latest?.details || "No details provided",
+                carrier,
+                eta: track.eta || "Pending",
+                location: latest?.location || "Unknown",
+                history
             };
 
         } catch (error: any) {
-            console.error("[Shippo Error]", error);
-            // Fallback for "First 10 Free" logic on error? 
-            // Or just throw to show error UI
-            throw new Error(error.message || "Failed to track package");
+            console.error("Shippo Error:", error);
+            // Fallback for API Errors
+            return {
+                trackingNumber,
+                status: "Error",
+                statusDetails: "Could not reach carrier API. " + (error.message || ""),
+                carrier,
+                eta: "Unknown",
+                location: "Unknown",
+                history: []
+            };
         }
     }
 }
