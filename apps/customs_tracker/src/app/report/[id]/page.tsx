@@ -1,0 +1,119 @@
+import { MockTrackingService } from "@/services/tracking";
+import { CustomsAnalyzer } from "@/services/analyzer";
+import { AlertTriangle, CheckCircle, Clock, Copy, Lock } from "lucide-react";
+
+// In real app, we fetch from DB. For now, we re-run logic.
+async function getReport(carrier: string, trackingNumber: string, country: string) {
+    const tracker = new MockTrackingService();
+    const analyzer = new CustomsAnalyzer();
+    const trackResult = await tracker.getStatus(carrier, trackingNumber);
+    return analyzer.analyze(trackResult, country);
+}
+
+export default async function ReportPage(props: {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ carrier: string; tracking: string; country: string; paid?: string }>;
+}) {
+    const searchParams = await props.searchParams;
+    const report = await getReport(searchParams.carrier, searchParams.tracking, searchParams.country);
+    const isPaid = searchParams.paid === "true"; // Mock Payment Check
+
+    const severityColor = {
+        low: "bg-green-100 text-green-800 border-green-200",
+        medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
+        high: "bg-red-100 text-red-800 border-red-200",
+    }[report.severity];
+
+    const Icon = {
+        low: CheckCircle,
+        medium: Clock,
+        high: AlertTriangle
+    }[report.severity];
+
+    return (
+        <div className="w-full max-w-2xl space-y-6 animate-in fade-in duration-500">
+
+            {/* 1. The Result (Always Free) - The Hook */}
+            <div className={`p-6 rounded-xl border ${severityColor} flex items-start gap-4 shadow-sm`}>
+                <Icon className="w-8 h-8 flex-shrink-0" />
+                <div>
+                    <h2 className="text-xl font-bold">{report.consumerStatus}</h2>
+                    <p className="text-sm opacity-90 mt-1">Estimating {report.estimatedDelay} delay.</p>
+                </div>
+            </div>
+
+            {/* 2. Action Plan (Free Preview) */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                <h3 className="font-bold text-gray-900 mb-4">Action Plan</h3>
+                <ul className="space-y-3">
+                    {report.actionItems.map((item, i) => (
+                        <li key={i} className="flex gap-3 text-gray-700">
+                            <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
+                                {i + 1}
+                            </span>
+                            {item}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            {/* 3. The Value (Gated) - The Solution */}
+            {report.emailTemplate && (
+                <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden relative">
+                    <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                        <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                            Reply to Customer
+                            {!isPaid && <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">PREMIUM</span>}
+                        </h3>
+                    </div>
+
+                    {isPaid ? (
+                        // PAID VIEW
+                        <div className="p-6">
+                            <div className="font-mono text-sm bg-blue-50 p-4 rounded-lg border border-blue-100 text-gray-700 whitespace-pre-wrap">
+                                <div className="font-bold mb-2 text-blue-800">Subject: {report.emailTemplate.subject}</div>
+                                {report.emailTemplate.body}
+                            </div>
+                            <button className="mt-4 w-full py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-black transition-colors flex items-center justify-center gap-2">
+                                <Copy className="w-4 h-4" /> Copy Text
+                            </button>
+                        </div>
+                    ) : (
+                        // LOCKED VIEW (Blur)
+                        <div className="p-6 relative">
+                            <div className="font-mono text-sm text-gray-400 blur-sm select-none">
+                                <div className="font-bold mb-2">Subject: Re: Update on your shipment #12345</div>
+                                Hi [Customer], just wanted to give you a quick update on your package.
+                                It is currently clearing customs which is a standard procedure.
+                                I've attached the tracking details...
+                            </div>
+
+                            {/* Paywall Overlay */}
+                            <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center p-6 text-center">
+                                <Lock className="w-8 h-8 text-gray-900 mb-3" />
+                                <h4 className="font-bold text-lg text-gray-900">Unlock the Perfect Response</h4>
+                                <p className="text-sm text-gray-600 max-w-xs mb-4">
+                                    Don't say the wrong thing and trigger a chargeback. Get the exact template tailored to this status.
+                                </p>
+                                <a
+                                    href={`/report/${(await props.params).id}?carrier=${searchParams.carrier}&tracking=${searchParams.tracking}&country=${searchParams.country}&paid=true`}
+                                    className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-transform active:scale-95 flex items-center gap-2"
+                                >
+                                    Unlock for $9 (Simulated)
+                                </a>
+                                <p className="text-xs text-gray-400 mt-2">One-time fee. 100% Guarantee.</p>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+
+            <div className="text-center">
+                <a href="/" className="text-sm text-gray-400 hover:text-gray-900 transition-colors">
+                    Check Another Package
+                </a>
+            </div>
+
+        </div>
+    );
+}
