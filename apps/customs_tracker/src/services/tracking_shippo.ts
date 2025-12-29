@@ -1,10 +1,9 @@
-import shippo from "shippo";
 import { ITrackingService, TrackingResult } from "./tracking";
 
 // Initialize Shippo with the Test Token (or Live Token from env)
 // In production, use process.env.SHIPPO_API_KEY
-// Initialize Shippo with the Token from Env
 const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
+const shippo = require("shippo");
 const client = shippo(SHIPPO_TOKEN);
 
 export class ShippoTrackingService implements ITrackingService {
