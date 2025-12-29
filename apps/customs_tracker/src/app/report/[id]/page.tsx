@@ -64,6 +64,20 @@ export default async function ReportPage(props: {
                 </div>
             </div>
 
+            {/* 1.5 RISK SCORE CARD (New) */}
+            <div className={`p-4 rounded-xl border flex justify-between items-center ${report.riskAssessment.visualColor}`}>
+                <div>
+                    <div className="text-xs font-bold uppercase tracking-wider opacity-80">Customs Risk Score</div>
+                    <div className="text-2xl font-black">{report.riskAssessment.score}/100</div>
+                </div>
+                <div className="text-right">
+                    <div className="font-bold">{report.riskAssessment.level}</div>
+                    <div className="text-xs opacity-80 max-w-[150px] leading-tight">
+                        {report.riskAssessment.reasons[0] || "Standard Processing"}
+                    </div>
+                </div>
+            </div>
+
             {/* 2. Action Plan (Free Preview) */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                 <h3 className="font-bold text-gray-900 mb-4">Action Plan</h3>
