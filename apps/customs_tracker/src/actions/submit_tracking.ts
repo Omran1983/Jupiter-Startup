@@ -1,7 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { CustomsRunInputSchema } from "../../../../packages/core/src/types";
+import { CustomsRunInputSchema } from "../types/validation";
 import { processRun } from "../workflows/process_run";
 
 export async function submitTracking(formData: FormData) {

@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { MockTrackingService } from "../services/tracking";
 import { CustomsAnalyzer } from "../services/analyzer";
-import { CustomsRunInput } from "../../../../packages/core/src/types";
+import { CustomsRunInput } from "../types/validation";
 
 // Setup Supabase Client (Service Role for Writes)
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
