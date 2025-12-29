@@ -11,6 +11,8 @@ export const metadata: Metadata = {
 
 import Header from "@/components/Header";
 
+import CarrierSideBar from "@/components/CarrierSideBar";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -19,8 +21,9 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={inter.className}>
-                <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900">
+                <div className="min-h-screen flex flex-col items-center bg-gray-50 text-gray-900 overflow-x-hidden">
                     <Header />
+                    <CarrierSideBar />
                     <main className="w-full max-w-5xl p-6 flex-1 flex flex-col items-center justify-center">
                         {children}
                     </main>
