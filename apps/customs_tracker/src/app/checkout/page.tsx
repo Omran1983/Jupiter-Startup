@@ -47,8 +47,9 @@ function CheckoutContent() {
                 <div className="p-4 border border-blue-100 bg-blue-50 rounded-lg">
                     <p className="text-sm text-blue-800 mb-3">To complete purchase instantly:</p>
                     <a
-                        href="https://paypal.me/YOUR_PAYPAL_HANDLE"
+                        href="https://paypal.me/YOUR_HANDLE_HERE"
                         target="_blank"
+                        rel="noopener noreferrer"
                         className="block w-full bg-[#0070BA] text-white font-bold py-3 rounded-lg hover:bg-[#005ea6] transition-colors"
                     >
                         Pay with PayPal
