@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { MockTrackingService } from "../services/tracking";
+import { ShippoTrackingService } from "../services/tracking_shippo";
 import { CustomsAnalyzer } from "../services/analyzer";
 import { CustomsRunInput } from "../types/validation";
 
@@ -21,7 +21,7 @@ export async function processRun(context: RunContext) {
     console.log(`[Orchestrator] Starting Run ${context.runId}...`);
 
     // 1. Init Services
-    const tracker = new MockTrackingService();
+    const tracker = new ShippoTrackingService();
     const analyzer = new CustomsAnalyzer();
 
     // 2. Execute Tracking

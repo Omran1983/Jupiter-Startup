@@ -14,62 +14,90 @@ export interface AnalysisResult {
 
 export class CustomsAnalyzer {
     analyze(result: TrackingResult, country: string): AnalysisResult {
-        // --- Scenarios ---
+        const raw = (result.rawStatus || "").toLowerCase();
+        const details = result.history.map(h => (h.details || "").toLowerCase()).join(" ");
+        const fullText = `${raw} ${details}`;
 
-        // 1. Customs Hold
-        if (result.status === "customs_hold") {
+        // --- AUTHENTIC SCENARIO 1: MISSING INVOICE ---
+        if (fullText.includes("invoice") || fullText.includes("documentation") || fullText.includes("paperwork")) {
             return {
-                consumerStatus: "Processing at International Customs (Routine)",
+                consumerStatus: "Held - Documentation Missing",
+                severity: "high",
+                estimatedDelay: "Indefinite until resolved",
+                actionItems: [
+                    "The Customs Authority needs a Commercial Invoice.",
+                    "You (the buyer) usually cannot provide this.",
+                    "You must ask the Seller to send it to the carrier."
+                ],
+                refundAdvice: "Ask seller to intervene. If they fail, chargeback.",
+                emailTemplate: {
+                    subject: "Urgent: Customs requires Commercial Invoice for Order #[Order ID]",
+                    body: `Hi [Seller Name],\n\nI am contacting you regarding my order #[Order ID] (Tracking: ${result.trackingNumber}).\n\nThe carrier has flagged that the shipment is HELD at customs due to a missing or incorrect Commercial Invoice.\n\nPlease provide the invoice to the carrier immediately so the package can be released. If this is not resolved by [Date], I will have to request a refund.\n\nPlease confirm when this is done.\n\nThanks,\n[My Name]`
+                }
+            };
+        }
+
+        // --- AUTHENTIC SCENARIO 2: RESTRICTED/PROHIBITED ---
+        if (fullText.includes("prohibited") || fullText.includes("seized") || fullText.includes("confiscated")) {
+            return {
+                consumerStatus: "Seized - Prohibited Item",
+                severity: "high",
+                estimatedDelay: "Permanent Stop",
+                actionItems: [
+                    "Item has been seized by Border Control.",
+                    "It will not be delivered.",
+                    "Contact seller for refund immediately."
+                ],
+                refundAdvice: "Claim refund immediately. Item is gone.",
+                emailTemplate: {
+                    subject: "Refund Request: Order #[Order ID] Seized by Customs",
+                    body: `Hi [Seller Name],\n\nMy order (Tracking: ${result.trackingNumber}) has been marked as SEIZED/PROHIBITED by customs.\n\nSince I cannot receive this item, I am requesting a full refund immediately.\n\nPlease process this refund within 24 hours.\n\nRegards,\n[My Name]`
+                }
+            };
+        }
+
+        // --- AUTHENTIC SCENARIO 3: GENERIC CUSTOMS HOLD ---
+        if (result.status === "customs_hold" || fullText.includes("customs") || fullText.includes("clearance") || fullText.includes("tax") || fullText.includes("duty")) {
+            return {
+                consumerStatus: "Processing at International Customs",
                 severity: "medium",
                 estimatedDelay: "3-12 Days (Average)",
                 actionItems: [
-                    "Do NOT refund the customer yet.",
-                    "Check tracking again in 48 hours for a 'Released' status.",
-                    "Monitor for 'Seized' or 'Duty Unpaid' notices (rare).",
+                    "Wait 3-5 more days.",
+                    "This is standard processing.",
+                    "Draft a 'Nudge' email to the seller just in case."
                 ],
-                refundAdvice:
-                    "It is premature to refund. Most packages clear within 10 days. Refunding now risks total loss if the package is delivered next week.",
+                refundAdvice: "Too early to refund. Wait 10 days.",
                 emailTemplate: {
-                    subject: "Update on your order: currently clearing customs",
-                    body: `Hi [Customer Name],\n\nI checked the status of your order. It is currently moving through standard customs clearance in ${country}. This is a routine manufacturing/import step and usually takes a few business days.\n\nEverything looks normal. I will keep an eye on it and update you if it takes longer than the average 12-day window.\n\nThanks,\n[Your Name]`,
-                },
+                    subject: "Inquiry: Status of Order #[Order ID]",
+                    body: `Hi [Seller Name],\n\nI noticed my order (Tracking: ${result.trackingNumber}) has been stuck in 'Customs Clearance' for several days.\n\nIs there any documentation required from my side? Or do I just need to wait?\n\nI would appreciate a check on your end.\n\nThanks,\n[My Name]`
+                }
             };
         }
 
-        // 2. Transporting
-        if (result.status === "transit") {
-            return {
-                consumerStatus: "Moving through logistics network",
-                severity: "low",
-                estimatedDelay: "On Schedule",
-                actionItems: ["No action needed."],
-                refundAdvice: "Do not refund. Package is moving.",
-                emailTemplate: undefined,
-            };
-        }
-
-        // 3. Delivered
-        if (result.status === "delivered") {
+        // --- SCENARIO 4: DELIVERED ---
+        if (result.status === "delivered" || fullText.includes("delivered")) {
             return {
                 consumerStatus: "Delivered",
                 severity: "low",
                 estimatedDelay: "None",
-                actionItems: ["Verify delivery proof if customer claims non-receipt."],
-                refundAdvice: "Item delivered. Refund only if product is defective.",
+                actionItems: ["Check mailbox/porch.", "Ask neighbors."],
+                refundAdvice: "Item marked delivered. Hard to refund.",
                 emailTemplate: {
-                    subject: "Your order has arrived!",
-                    body: `Hi [Customer Name],\n\nGood news! Your order was marked delivered at ${result.lastUpdated}.\n\nEnjoy!\n[Your Name]`,
+                    subject: "Question regarding delivered Order #[Order ID]",
+                    body: `Hi [Seller Name],\n\nThe tracking shows delivered, but I have a question regarding the contents...\n\n[Type Question Here]\n\nThanks,\n[My Name]`
                 },
             };
         }
 
-        // Default Fallback
+        // --- SCENARIO 5: TRANSIT/DEFAULT ---
         return {
-            consumerStatus: "Status Unknown",
-            severity: "medium",
-            estimatedDelay: "Unknown",
-            actionItems: ["Contact Carrier support for details."],
-            refundAdvice: "Wait for carrier update.",
+            consumerStatus: "In Transit",
+            severity: "low",
+            estimatedDelay: "On Schedule",
+            actionItems: ["No action needed. moving normally."],
+            refundAdvice: "Do not refund. Package is moving.",
+            emailTemplate: undefined,
         };
     }
 }

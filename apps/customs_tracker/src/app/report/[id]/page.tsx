@@ -1,13 +1,18 @@
-import { MockTrackingService } from "@/services/tracking";
+import { ShippoTrackingService } from "@/services/tracking_shippo";
 import { CustomsAnalyzer } from "@/services/analyzer";
 import { AlertTriangle, CheckCircle, Clock, Copy, Lock } from "lucide-react";
 
 // In real app, we fetch from DB. For now, we re-run logic.
 async function getReport(carrier: string, trackingNumber: string, country: string) {
-    const tracker = new MockTrackingService();
+    // try {
+    const tracker = new ShippoTrackingService();
     const analyzer = new CustomsAnalyzer();
     const trackResult = await tracker.getStatus(carrier, trackingNumber);
     return analyzer.analyze(trackResult, country);
+    // } catch (e) {
+    //     console.error("Tracking Failed", e);
+    //     return null;
+    // }
 }
 
 export default async function ReportPage(props: {
@@ -15,7 +20,24 @@ export default async function ReportPage(props: {
     searchParams: Promise<{ carrier: string; tracking: string; country: string; paid?: string }>;
 }) {
     const searchParams = await props.searchParams;
-    const report = await getReport(searchParams.carrier, searchParams.tracking, searchParams.country);
+    let report;
+    try {
+        report = await getReport(searchParams.carrier, searchParams.tracking, searchParams.country);
+    } catch (e) {
+        // Fallback for demo/invalid numbers
+        report = null;
+    }
+
+    if (!report) {
+        return (
+            <div className="w-full max-w-2xl p-6 bg-red-50 border border-red-200 rounded-xl text-center">
+                <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+                <h2 className="text-xl font-bold text-red-900">Tracking Failed</h2>
+                <p className="text-red-700 mb-4">We could not retrieve data for <b>{searchParams.tracking}</b> via {searchParams.carrier}.</p>
+                <a href="/" className="text-sm font-bold text-red-600 hover:underline">Try Another Number</a>
+            </div>
+        );
+    }
     const isPaid = searchParams.paid === "true"; // Mock Payment Check
 
     const severityColor = {
