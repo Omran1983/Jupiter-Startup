@@ -29,10 +29,11 @@ export default function RootLayout({
                     </main>
                     <footer className="p-8 text-center border-t border-gray-100 w-full mt-8 bg-white/50">
                         <div className="flex flex-col gap-2 text-sm text-gray-500">
-                            <p className="font-semibold">Operated by [YOUR COMPANY NAME]</p>
-                            <p>BRN: [YOUR BRN NUMBER] | Contact: [YOUR EMAIL/PHONE]</p>
-                            <p className="text-xs text-gray-400 mt-4">
-                                Operational guidance only. Not legal advice. Customs regulations vary by country.
+                            <p className="font-semibold cursor-help" title="Registered in Republic of Mauritius">Operated by A-One Global Resourcing Ltd</p>
+                            <p className="text-xs opacity-80">BRN: C22185206 | TAN: 28006142</p>
+                            <p className="text-xs opacity-80">deals@aogrl.com | +230 5788 7132</p>
+                            <p className="text-[10px] text-gray-400 mt-4 uppercase tracking-wider">
+                                Operational guidance only. Not legal advice.
                             </p>
                         </div>
                     </footer>
