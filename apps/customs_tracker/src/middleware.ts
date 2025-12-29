@@ -9,6 +9,12 @@ export async function middleware(request: NextRequest) {
         },
     })
 
+    // SAFETY CHECK: If Env Vars are missing in Vercel, skip Auth to prevent 500 Crash
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        console.error("CRITICAL: Supabase Env Vars missing in Middleware. Auth functionality disabled to prevent crash.");
+        return response;
+    }
+
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
