@@ -1,4 +1,4 @@
-import * as shippo from "shippo";
+import shippo from "shippo";
 import { ITrackingService, TrackingResult } from "./tracking";
 
 // Initialize Shippo with the Test Token (or Live Token from env)
