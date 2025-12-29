@@ -5,7 +5,7 @@ import { ITrackingService, TrackingResult } from "./tracking";
 // Initialize Shippo with the Test Token (or Live Token from env)
 // In production, use process.env.SHIPPO_API_KEY
 const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
-const client = shippo(SHIPPO_TOKEN);
+const client = (shippo as any)(SHIPPO_TOKEN);
 
 export class ShippoTrackingService implements ITrackingService {
     async getStatus(carrier: string, trackingNumber: string): Promise<TrackingResult> {
