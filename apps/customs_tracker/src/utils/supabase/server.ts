@@ -5,9 +5,31 @@ import { cookies } from 'next/headers'
 export async function createClient() {
     const cookieStore = await cookies()
 
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // SAFETY CHECK: Safe Mode for missing credentials
+    // Returns a "Mock" client that pretends to be logged out
+    if (!supabaseUrl || !supabaseKey) {
+        console.warn("Supabase Env Vars missing. Using Mock Client (Logged Out).");
+        return {
+            auth: {
+                getUser: async () => ({ data: { user: null }, error: null }),
+                signOut: async () => ({ error: null }),
+            },
+            from: () => ({
+                select: () => ({
+                    eq: () => ({
+                        single: async () => ({ data: null, error: null })
+                    })
+                })
+            })
+        } as any;
+    }
+
     return createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseKey,
         {
             cookies: {
                 getAll() {
