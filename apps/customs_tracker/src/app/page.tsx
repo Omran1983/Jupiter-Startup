@@ -4,6 +4,7 @@ import { CreditBalance } from "../components/CreditBalance";
 import { BuyCredits } from "../components/BuyCredits";
 import FeaturesGrid from "../components/FeaturesGrid";
 import TrustSection from "../components/TrustSection";
+import NetworkStatus from "../components/NetworkStatus";
 
 export default function Home() {
     return (
@@ -99,7 +100,10 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* CONTENT FILL (The Fix for "Blank Space") */}
+            {/* INTELLIGENCE LAYER */}
+            <NetworkStatus />
+
+            {/* CONTENT FILL */}
             <TrustSection />
             <FeaturesGrid />
 
