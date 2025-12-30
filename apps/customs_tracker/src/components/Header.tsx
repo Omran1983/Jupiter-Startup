@@ -44,9 +44,15 @@ export default async function Header() {
                     <>
                         <div className="flex flex-col items-end mr-4">
                             <span className="text-sm font-medium text-slate-200">{user.email?.split('@')[0]}</span>
-                            <span className={`text-xs ${creditBalance > 0 ? 'text-green-400 font-bold' : 'text-red-400'}`}>
-                                Wallet: {creditBalance} Credits
-                            </span>
+                            {creditBalance > 0 ? (
+                                <span className="text-xs text-green-400 font-bold">
+                                    Wallet: {creditBalance} Credits
+                                </span>
+                            ) : (
+                                <span className="text-xs text-blue-400 font-bold bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">
+                                    ✨ Free Member
+                                </span>
+                            )}
                         </div>
                         <form action={async () => {
                             "use server";

@@ -11,10 +11,6 @@ export default function Home() {
         <div className="w-full flex flex-col min-h-screen">
             {/* HERO SECTION */}
             <div className="w-full max-w-4xl mx-auto p-4 flex flex-col justify-center min-h-[70vh]">
-                <div className="flex justify-end mb-8">
-                    <CreditBalance credits={0} />
-                </div>
-
                 <div className="w-full max-w-lg mx-auto bg-slate-800/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-slate-700/50">
                     <div className="text-center mb-8 relative">
                         <div className="absolute -top-6 right-0 flex items-center gap-2 px-3 py-1 bg-green-500/10 rounded-full border border-green-500/20 shadow-[0_0_10px_rgba(74,222,128,0.2)]">
