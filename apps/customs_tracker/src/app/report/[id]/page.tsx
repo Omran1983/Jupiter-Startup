@@ -1,6 +1,7 @@
 import { ShippoTrackingService } from "@/services/tracking_shippo";
 import { CustomsAnalyzer } from "@/services/analyzer";
 import { AlertTriangle, CheckCircle, Clock, Copy, Lock } from "lucide-react";
+import DownloadEvidenceButton from "@/components/DownloadEvidenceButton";
 
 // In real app, we fetch from DB. For now, we re-run logic.
 async function getReport(carrier: string, trackingNumber: string, country: string) {
@@ -8,7 +9,9 @@ async function getReport(carrier: string, trackingNumber: string, country: strin
     const tracker = new ShippoTrackingService();
     const analyzer = new CustomsAnalyzer();
     const trackResult = await tracker.getStatus(carrier, trackingNumber);
-    return analyzer.analyze(trackResult, country);
+    // Merge the analyzer result with raw tracking data so the button has access to history
+    // We append the raw tracking object to the analyzer result for the PDF generator
+    return { ...analyzer.analyze(trackResult, country), rawData: trackResult };
     // } catch (e) {
     //     console.error("Tracking Failed", e);
     //     return null;
@@ -56,11 +59,16 @@ export default async function ReportPage(props: {
         <div className="w-full max-w-2xl space-y-6 animate-in fade-in duration-500">
 
             {/* 1. The Result (Always Free) - The Hook */}
-            <div className={`p-6 rounded-xl border ${severityColor} flex items-start gap-4 shadow-sm`}>
+            <div className={`p-6 rounded-xl border ${severityColor} flex items-start gap-4 shadow-sm relative`}>
                 <Icon className="w-8 h-8 flex-shrink-0" />
-                <div>
+                <div className="flex-1">
                     <h2 className="text-xl font-bold">{report.consumerStatus}</h2>
                     <p className="text-sm opacity-90 mt-1">Estimating {report.estimatedDelay} delay.</p>
+                </div>
+                {/* PDF Button */}
+                <div className="absolute top-6 right-6">
+                    {/* @ts-ignore - rawData is injected above */}
+                    <DownloadEvidenceButton report={report.rawData} />
                 </div>
             </div>
 
