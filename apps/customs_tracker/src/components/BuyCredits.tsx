@@ -106,7 +106,7 @@ export function BuyCredits() {
             </div>
             <p className="text-xs text-center text-gray-400 mt-6 max-w-sm mx-auto">
                 Payments processed securely via PayPal. Credits added instantly.
-                <br />Founders Plan (B2B): <a href="#" className="underline">Contact Sales</a>
+                <br />Founders Plan (B2B): <a href="mailto:deals@aogrl.com?subject=Founders Plan Inquiry" className="underline hover:text-white transition-colors">Contact Sales</a>
             </p>
         </div>
     );
