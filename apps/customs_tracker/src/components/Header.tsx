@@ -30,6 +30,15 @@ export default async function Header() {
                 <span className="bg-blue-600 text-white p-1 rounded">📦</span> CustomsTracker
             </Link>
 
+            <nav className="hidden md:flex items-center gap-6 ml-8 mr-auto">
+                <Link href="/tools/hs-code" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
+                    HS Code Detective
+                </Link>
+                <Link href="/templates" className="text-sm font-medium text-slate-400 hover:text-white transition-colors">
+                    Claim Templates
+                </Link>
+            </nav>
+
             <div className="flex items-center gap-4">
                 {user ? (
                     <>

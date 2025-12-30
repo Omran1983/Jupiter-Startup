@@ -4,7 +4,7 @@ import { CreditBalance } from "../components/CreditBalance";
 import { BuyCredits } from "../components/BuyCredits";
 import FeaturesGrid from "../components/FeaturesGrid";
 import TrustSection from "../components/TrustSection";
-import HSCodeSearch from "../components/HSCodeSearch";
+// HS Code Search Removed (Moved to /tools)
 
 export default function Home() {
     return (
@@ -99,9 +99,6 @@ export default function Home() {
                     </form>
                 </div>
             </div>
-
-            {/* REAL INTELLIGENCE: HS Code Detective */}
-            <HSCodeSearch />
 
             {/* CONTENT FILL (TRUST & FEATURES) */}
             <TrustSection />
