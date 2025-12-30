@@ -4,7 +4,7 @@ import { CreditBalance } from "../components/CreditBalance";
 import { BuyCredits } from "../components/BuyCredits";
 import FeaturesGrid from "../components/FeaturesGrid";
 import TrustSection from "../components/TrustSection";
-import NetworkStatus from "../components/NetworkStatus";
+import HSCodeSearch from "../components/HSCodeSearch";
 
 export default function Home() {
     return (
@@ -100,10 +100,10 @@ export default function Home() {
                 </div>
             </div>
 
-            {/* INTELLIGENCE LAYER */}
-            <NetworkStatus />
+            {/* REAL INTELLIGENCE: HS Code Detective */}
+            <HSCodeSearch />
 
-            {/* CONTENT FILL */}
+            {/* CONTENT FILL (TRUST & FEATURES) */}
             <TrustSection />
             <FeaturesGrid />
 
