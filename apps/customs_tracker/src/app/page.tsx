@@ -90,7 +90,7 @@ export default function Home() {
                             className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold py-4 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-900/20 active:scale-[0.98] mt-2 group"
                         >
                             <Search className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            Analyze Status (1 Credit)
+                            Analyze Status
                         </button>
 
                         <p className="text-[10px] text-center text-slate-600 mt-6">
