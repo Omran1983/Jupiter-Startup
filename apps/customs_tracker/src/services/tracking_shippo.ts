@@ -40,17 +40,39 @@ export class ShippoTrackingService implements ITrackingService {
         try {
             console.log(`[Shippo] Tracking ${carrier} ${trackingNumber}`);
 
-            // Init client ONLY when needed (Runtime)
+            // 1. Primary Attempt
             const client = this.getClient();
-            const track = await client.track.get_status(carrier, trackingNumber);
+            let track = await client.track.get_status(carrier, trackingNumber);
+
+            // 2. Deep Scan Logic (Auto-Detect)
+            // If primary carrier has NO history (e.g. USPS waiting for Yanwen), try fallbacks
+            if (!track || !track.tracking_history || track.tracking_history.length === 0) {
+                console.log("[Shippo] Primary carrier empty. Initiating Deep Scan...");
+                const FALLBACKS = ['yanwen', 'china-post', '4px', 'cainiao']; // Common dropshipping carriers
+
+                for (const fallback of FALLBACKS) {
+                    if (fallback === carrier) continue; // Skip explicit duplicate
+                    try {
+                        const deepTrack = await client.track.get_status(fallback, trackingNumber);
+                        if (deepTrack && deepTrack.tracking_history && deepTrack.tracking_history.length > 0) {
+                            console.log(`[Shippo] Details found via ${fallback}!`);
+                            track = deepTrack; // Swap to the better data provider
+                            carrier = fallback; // Update reported carrier
+                            break; // Stop scanning once we find data
+                        }
+                    } catch (ignore) {
+                        // Fallback failed, continue to next
+                    }
+                }
+            }
 
             if (!track || !track.tracking_history || track.tracking_history.length === 0) {
-                // Return basic info if no history found
+                // Return basic info if no history found after all attempts
                 return {
                     carrier,
                     trackingNumber,
                     status: "pre_transit", // Valid Type
-                    rawStatus: "Carrier has no data yet",
+                    rawStatus: "Carrier has no data yet (Deep Scan Complete)",
                     location: "Unknown",
                     lastUpdated: new Date().toISOString(),
                     estimatedDelivery: "Unknown",
@@ -62,7 +84,8 @@ export class ShippoTrackingService implements ITrackingService {
             const history = track.tracking_history.map((h: any) => ({
                 date: h.status_date || new Date().toISOString(),
                 status: h.status || "Unknown",
-                details: h.status_details || ""
+                details: h.status_details || "",
+                location: h.location?.city || h.location?.country || "" // Robust location mapping
             }));
 
             // Get latest status
@@ -79,11 +102,11 @@ export class ShippoTrackingService implements ITrackingService {
             }
 
             return {
-                carrier,
+                carrier, // Might be the fallback carrier now
                 trackingNumber,
                 status: finalStatus,
                 rawStatus: track.tracking_status?.status_details || latest?.details || "No details",
-                location: track.address_to?.city || latest?.location || "Unknown", // Shippo might behave differently
+                location: track.address_to?.city || latest?.location || "Unknown",
                 estimatedDelivery: track.eta || undefined,
                 lastUpdated: track.tracking_status?.status_date || latest?.date || new Date().toISOString(),
                 history
