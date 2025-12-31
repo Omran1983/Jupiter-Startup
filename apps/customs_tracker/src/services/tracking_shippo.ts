@@ -109,11 +109,33 @@ export class ShippoTrackingService implements ITrackingService {
                 }
             }
 
+            // 4. HYBRID FALLBACK: If Shippo has no history, try Public Service
+            if (!track || !track.tracking_history || track.tracking_history.length === 0) {
+                console.log(`[Shippo] No history found. Falling back to Public Service for ${carrier}...`);
+                try {
+                    // Lazy load to avoid circular dependency issues if any
+                    const { SmartFallbackService } = await import("./tracking_public");
+                    const publicTracker = new SmartFallbackService();
+                    const publicResult = await publicTracker.getStatus(carrier, trackingNumber);
+
+                    if (publicResult && publicResult.history && publicResult.history.length > 0) {
+                        console.log(`[Shippo] Public Service Fallback Successful!`);
+                        return {
+                            ...publicResult,
+                            // Ensure we keep the original carrier request if needed, or trust public result
+                            carrier: publicResult.carrier || carrier
+                        };
+                    }
+                } catch (fallbackError) {
+                    console.error("[Shippo] Public Fallback Failed:", fallbackError);
+                }
+            }
+
             if (!track || !track.tracking_history || track.tracking_history.length === 0) {
                 return {
                     carrier,
                     trackingNumber,
-                    status: "pre_transit",
+                    status: "pre_transit", // Default to pre_transit if absolutely no data found
                     rawStatus: "Carrier has no data yet (Deep Scan Complete)",
                     location: "Unknown",
                     lastUpdated: new Date().toISOString(),
@@ -125,7 +147,7 @@ export class ShippoTrackingService implements ITrackingService {
             // Map History safely to Interface
             const history = track.tracking_history.map((h: any) => ({
                 date: h.status_date || new Date().toISOString(),
-                status: h.status || "Unknown",
+                status: h.status || "Unknown", // Shippo status
                 details: h.status_details || "",
                 location: h.location?.city || h.location?.country || ""
             }));
