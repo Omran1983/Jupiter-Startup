@@ -109,7 +109,7 @@ export function BuyCredits() {
                         </Link>
 
                         <p className="text-[10px] text-center text-slate-400 mt-4">
-                            Secure Payment via PayPal / MCB
+                            Secure Payment via <span className="text-white font-bold">PayPal</span> (Buyer Protection)
                         </p>
                     </div>
                 ))}
