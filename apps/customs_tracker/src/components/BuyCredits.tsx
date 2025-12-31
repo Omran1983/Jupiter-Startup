@@ -14,7 +14,7 @@ const PACKS = [
         benefits: [
             "5 Chargeback Shield Reports",
             "PDF Legal Proof of Delivery",
-            "Win PayPal/Stripe Disputes",
+            "Win PayPal/Bank Disputes",
             "Basic Email Support"
         ],
         color: "bg-blue-50 text-blue-700 border-blue-200",
@@ -109,7 +109,7 @@ export function BuyCredits() {
                         </Link>
 
                         <p className="text-[10px] text-center text-slate-400 mt-4">
-                            Secure Payment via Stripe/PayPal
+                            Secure Payment via PayPal / MCB
                         </p>
                     </div>
                 ))}
