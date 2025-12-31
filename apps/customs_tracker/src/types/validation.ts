@@ -4,7 +4,7 @@ import { z } from "zod";
 export const CustomsRunInputSchema = z.object({
     carrier: z.string().min(2).max(40),
     trackingNumber: z.string().min(6).max(60),
-    destinationCountry: z.string().min(2).max(2), // ISO2 recommended
+    destinationCountry: z.string().min(2).max(60), // Allow full names (e.g. Mauritius)
     orderValue: z.number().nonnegative().optional(),
     currency: z.string().min(3).max(3).optional(),
     telegramChatId: z.string().optional(), // Optional: Override for specific notifications
