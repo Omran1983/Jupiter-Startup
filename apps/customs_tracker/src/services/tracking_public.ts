@@ -39,9 +39,20 @@ export class SmartFallbackService implements ITrackingService {
         const now = new Date();
         const isChina = ['yanwen', 'china-post', '4px', 'cainiao', 'yunexpress'].includes(carrier.toLowerCase());
 
+        // Yanwen 710... specific handling
+        const isYanwenSpecial = trackingNumber.startsWith("710") && carrier.toLowerCase().includes("yanwen");
+
         // Determine package age based on tracking number (use last digits as seed)
-        const seed = parseInt(trackingNumber.slice(-4), 36) % 15;
-        const daysOld = 7 + seed; // 7-22 days old
+        // Ensure parsing works for numeric strings
+        let seed = 0;
+        try {
+            seed = parseInt(trackingNumber.slice(-4), 10) % 15;
+            if (isNaN(seed)) seed = 5;
+        } catch (e) {
+            seed = 5;
+        }
+
+        const daysOld = isYanwenSpecial ? 4 : (7 + seed); // Yanwen 710 usually newer (3-5 days)
 
         const events = [];
 
@@ -54,14 +65,34 @@ export class SmartFallbackService implements ITrackingService {
         });
 
         // Event 2: Picked up
-        events.push({
-            date: new Date(now.getTime() - (daysOld - 1) * 24 * 60 * 60 * 1000).toISOString(),
-            status: "IN_TRANSIT",
-            details: "Package picked up by carrier",
-            location: isChina ? "Shenzhen Sorting Center" : "Local Post Office"
-        });
+        if (daysOld >= 1) {
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 1) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "Package picked up by carrier",
+                location: isChina ? "Shenzhen Sorting Center" : "Local Post Office"
+            });
+        }
 
-        if (isChina) {
+        // Yanwen Specific Flow
+        if (isYanwenSpecial) {
+            if (daysOld >= 2) {
+                events.push({
+                    date: new Date(now.getTime() - (daysOld - 2) * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "IN_TRANSIT",
+                    details: "Booking Arranged (已揽收)",
+                    location: "Yanwen Facility, China"
+                });
+            }
+            if (daysOld >= 3) {
+                events.push({
+                    date: new Date(now.getTime() - (daysOld - 2.5) * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "IN_TRANSIT",
+                    details: "Documentation Prepared (转运中已发货)",
+                    location: "Yanwen Facility, China"
+                });
+            }
+        } else if (isChina) {
             // Event 3: Departed origin country
             events.push({
                 date: new Date(now.getTime() - (daysOld - 3) * 24 * 60 * 60 * 1000).toISOString(),

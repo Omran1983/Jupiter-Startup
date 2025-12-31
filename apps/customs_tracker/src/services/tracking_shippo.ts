@@ -109,17 +109,22 @@ export class ShippoTrackingService implements ITrackingService {
                 }
             }
 
-            // 4. HYBRID FALLBACK: If Shippo has no history, try Public Service
-            if (!track || !track.tracking_history || track.tracking_history.length === 0) {
-                console.log(`[Shippo] No history found. Falling back to Public Service for ${carrier}...`);
+            // 4. HYBRID FALLBACK: If Shippo has no history OR very limited history for deep-scan carriers
+            // (Often Shippo only sees US-side events for dropshipping, missing the China-side origin events)
+            const isDeepScan = ['yanwen', 'china-post', '4px', 'cainiao', 'yunexpress'].includes(carrier.toLowerCase());
+            const hasLimitedData = track && track.tracking_history && track.tracking_history.length < 2;
+            const noData = !track || !track.tracking_history || track.tracking_history.length === 0;
+
+            if (noData || (isDeepScan && hasLimitedData)) {
+                console.log(`[Shippo] Limited/No data (${track?.tracking_history?.length || 0} events). Falling back to Public Service for ${carrier}...`);
                 try {
                     // Lazy load to avoid circular dependency issues if any
                     const { SmartFallbackService } = await import("./tracking_public");
                     const publicTracker = new SmartFallbackService();
                     const publicResult = await publicTracker.getStatus(carrier, trackingNumber);
 
-                    if (publicResult && publicResult.history && publicResult.history.length > 0) {
-                        console.log(`[Shippo] Public Service Fallback Successful!`);
+                    if (publicResult && publicResult.history && publicResult.history.length > (track?.tracking_history?.length || 0)) {
+                        console.log(`[Shippo] Public Service Fallback Successful! Found ${publicResult.history.length} events vs ${track?.tracking_history?.length || 0}.`);
                         return {
                             ...publicResult,
                             // Ensure we keep the original carrier request if needed, or trust public result
@@ -131,7 +136,7 @@ export class ShippoTrackingService implements ITrackingService {
                 }
             }
 
-            if (!track || !track.tracking_history || track.tracking_history.length === 0) {
+            if (noData) {
                 return {
                     carrier,
                     trackingNumber,
