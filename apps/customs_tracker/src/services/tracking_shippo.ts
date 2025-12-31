@@ -1,5 +1,5 @@
 
-import shippo from "shippo";
+import { Shippo } from "shippo";
 import { ITrackingService, TrackingResult } from "./tracking";
 
 export class ShippoTrackingService implements ITrackingService {
@@ -12,9 +12,11 @@ export class ShippoTrackingService implements ITrackingService {
         }
 
         try {
-            // @ts-ignore - Check for default export behavior if types are weird
-            const client = shippo(SHIPPO_TOKEN);
-            return client;
+            // New SDK Syntax (Speakeasy / v2+)
+            // Explicitly handling the "ShippoToken " prefix requirement for v2+
+            const token = SHIPPO_TOKEN.startsWith("ShippoToken") ? SHIPPO_TOKEN : `ShippoToken ${SHIPPO_TOKEN}`;
+            const client = new Shippo({ apiKeyHeader: token });
+            return client as any;
         } catch (e) {
             console.error("Shippo Init Failed:", e);
             throw new Error("Tracking API Initialization Failed");
