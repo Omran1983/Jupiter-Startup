@@ -108,8 +108,8 @@ export function BuyCredits() {
                             Get Protection
                         </Link>
 
-                        <p className="text-[10px] text-center text-slate-700 mt-4 font-medium">
-                            Secure Payment via <span className={`font-bold ${pack.id === 'pro' ? 'text-purple-700' : pack.id === 'enterprise' ? 'text-emerald-700' : 'text-blue-700'}`}>PayPal</span> (Buyer Protection)
+                        <p className="text-[11px] text-center text-slate-900 mt-4 font-semibold bg-slate-50 py-1 rounded">
+                            Secure Payment via <span className={`${pack.id === 'pro' ? 'text-purple-800' : pack.id === 'enterprise' ? 'text-emerald-800' : 'text-blue-800'}`}>PayPal</span> (Buyer Protection)
                         </p>
                     </div>
                 ))}
