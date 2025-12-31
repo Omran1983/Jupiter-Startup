@@ -28,9 +28,8 @@ const CARRIERS = [
 export default function CarriersPage() {
     return (
         <div className="w-full flex flex-col min-h-screen bg-[#020617] text-slate-200">
-            <Header />
 
-            <main className="flex-grow pt-32 px-6">
+            <main className="flex-grow pt-8 px-6">
                 <div className="max-w-6xl mx-auto">
                     <div className="flex items-center gap-4 mb-10">
                         <Link href="/" className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors">
@@ -64,7 +63,7 @@ export default function CarriersPage() {
                         </p>
                         <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all">
                             <Search className="w-4 h-4" />
-                            Test Tracking Number
+                            Check Tracking Number
                         </Link>
                     </div>
                 </div>
