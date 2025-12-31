@@ -86,6 +86,36 @@ export default async function ReportPage(props: {
                 </div>
             </div>
 
+            {/* 1.8 TRACKING HISTORY (New Request) */}
+            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
+                <h3 className="font-bold text-gray-900 mb-4">Tracking Timeline</h3>
+                {/* @ts-ignore - rawData is checked */}
+                {(report.rawData.history && report.rawData.history.length > 0) ? (
+                    <div className="relative pl-4 border-l-2 border-gray-100 space-y-6">
+                        {/* @ts-ignore */}
+                        {report.rawData.history.slice(0, 5).map((event: any, i: number) => (
+                            <div key={i} className="relative">
+                                <div className="absolute -left-[21px] top-1 w-3 h-3 rounded-full bg-blue-500 border-2 border-white ring-1 ring-blue-100"></div>
+                                <div className="text-sm font-bold text-gray-900">{event.status}</div>
+                                <div className="text-xs text-gray-500 mb-1">
+                                    {new Date(event.date).toLocaleDateString()} at {new Date(event.date).toLocaleTimeString()}
+                                    {event.location && ` • ${event.location}`}
+                                </div>
+                                <div className="text-sm text-gray-600 leading-relaxed">{event.details}</div>
+                            </div>
+                        ))}
+                        {/* @ts-ignore */}
+                        {report.rawData.history.length > 5 && (
+                            <div className="text-xs text-gray-400 italic pt-2">
+                                + {report.rawData.history.length - 5} more updates...
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <p className="text-sm text-gray-500 italic">No detailed tracking events found.</p>
+                )}
+            </div>
+
             {/* 2. Action Plan (Free Preview) */}
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                 <h3 className="font-bold text-gray-900 mb-4">Action Plan</h3>
