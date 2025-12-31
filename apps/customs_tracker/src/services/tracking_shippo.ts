@@ -12,6 +12,31 @@ export class ShippoTrackingService implements ITrackingService {
         return "transit";
     }
 
+    // Intelligent Heuristic to save API credits
+    // Returns a prioritized list of carriers to try
+    private detectCarrierPattern(tracking: string): string[] {
+        // Yanwen: Often starts with VR, UR, LP, or starts with 7 (like 710...) and 12-14 digits
+        if (/^(VR|UR|LP|SY)/i.test(tracking) || /^7[0-9]{11,13}$/.test(tracking) || /^H[A-Z0-9]+/.test(tracking)) {
+            return ['yanwen', 'china-post', '4px'];
+        }
+        // USPS: 20-22 digits, or starts with 92/93, or standard XX...US
+        if (/^[0-9]{20,22}$/.test(tracking) || /^[A-Z]{2}[0-9]{9}US$/.test(tracking)) {
+            return ['usps'];
+        }
+        // China Post: XX...CN (e.g. LV...CN)
+        if (/^[A-Z]{2}[0-9]{9}CN$/.test(tracking)) {
+            // China Post numbers are often dual-scannable via EMS or Cainiao
+            return ['china-post', 'ems', 'cainiao'];
+        }
+        // 4PX: often numeric or 4PX prefix, but variable
+        if (/^4PX/i.test(tracking)) {
+            return ['4px'];
+        }
+
+        // Default Fallback Order (Most popular dropshipping first)
+        return ['yanwen', 'china-post', 'usps', '4px', 'cainiao'];
+    }
+
     async getStatus(carrier: string, trackingNumber: string): Promise<TrackingResult> {
         const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
         if (!SHIPPO_TOKEN) throw new Error("Missing credentials");
@@ -28,7 +53,7 @@ export class ShippoTrackingService implements ITrackingService {
                 cache: "no-store",
             });
             if (!res.ok) {
-                // Log failed attempts for debugging
+                // Log failed attempts for debugging (optional)
                 // console.log(`[Shippo] Failed ${c}/${t}: ${res.status}`);
                 return null;
             }
@@ -38,23 +63,46 @@ export class ShippoTrackingService implements ITrackingService {
         try {
             console.log(`[Shippo] Tracking ${carrier} ${trackingNumber}`);
 
-            // 1. Primary Attempt
-            let track = await fetchShippo(carrier, trackingNumber);
+            // OPTIMIZATION: Check pattern first
+            const recommendedCarriers = this.detectCarrierPattern(trackingNumber);
+            let track = null;
+            let finalCarrier = carrier;
 
-            // 2. Deep Scan Logic (Auto-Detect)
-            // If primary carrier has NO history (e.g. USPS waiting for Yanwen), try fallbacks
+            // 1. Try Recommended First logic
+            // If the user's selected carrier is in the recommended list, try that specific one first
+            // Otherwise, start from the top of the recommended list
+
+            const userSelectionMatchesRecommendation = recommendedCarriers.includes(carrier.toLowerCase());
+
+            if (userSelectionMatchesRecommendation) {
+                // Trust user + heuristics
+                track = await fetchShippo(carrier, trackingNumber);
+            } else {
+                // User might be wrong (e.g. tracking Yanwen number as USPS)
+                // Or we might be wrong.
+                // Strategy: Try the top Recommended Carrier first (likely correct), then fallback to User's choice.
+                console.log(`[Shippo] Auto-Detect suggests ${recommendedCarriers[0]} instead of ${carrier}`);
+                track = await fetchShippo(recommendedCarriers[0], trackingNumber);
+                if (track && track.tracking_history && track.tracking_history.length > 0) {
+                    finalCarrier = recommendedCarriers[0];
+                } else {
+                    // Fallback to what user asked for
+                    track = await fetchShippo(carrier, trackingNumber);
+                }
+            }
+
+            // 3. Deep Scan / Fallback (Smart Mode) if still empty
             if (!track || !track.tracking_history || track.tracking_history.length === 0) {
-                console.log("[Shippo] Primary carrier empty. Initiating Deep Scan...");
-                const FALLBACKS = ['yanwen', 'china-post', '4px', 'cainiao'];
+                console.log("[Shippo] Scan Empty. Trying Smart Fallbacks...");
 
-                for (const fallback of FALLBACKS) {
-                    if (fallback === carrier) continue;
+                for (const fallback of recommendedCarriers) {
+                    if (fallback === finalCarrier.toLowerCase()) continue;
                     try {
                         const deepTrack = await fetchShippo(fallback, trackingNumber);
                         if (deepTrack && deepTrack.tracking_history && deepTrack.tracking_history.length > 0) {
-                            console.log(`[Shippo] Details found via ${fallback}!`);
+                            console.log(`[Shippo] Match via ${fallback}!`);
                             track = deepTrack;
-                            carrier = fallback;
+                            finalCarrier = fallback;
                             break;
                         }
                     } catch (ignore) { }
@@ -94,7 +142,7 @@ export class ShippoTrackingService implements ITrackingService {
             }
 
             return {
-                carrier,
+                carrier: finalCarrier,
                 trackingNumber,
                 status: finalStatus,
                 rawStatus: track.tracking_status?.status_details || latest?.details || "No details",

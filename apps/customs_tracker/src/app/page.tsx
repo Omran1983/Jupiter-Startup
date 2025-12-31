@@ -59,12 +59,11 @@ export default function Home() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 ml-1">Tracking Number</label>
-                            <input
+                            <label className="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 ml-1">Tracking Number(s)</label>
+                            <textarea
                                 name="trackingNumber"
-                                type="text"
-                                placeholder="e.g. LY123456789CN"
-                                className="w-full p-4 text-lg border border-slate-700/50 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all hover:bg-slate-800 font-mono shadow-inner tracking-wide"
+                                placeholder="Enter tracking numbers (one per line)&#10;Example:&#10;VR123456789YP&#10;9400100000000000000000"
+                                className="w-full p-4 border border-slate-700/50 rounded-xl bg-slate-900/50 text-white placeholder-slate-600 focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 outline-none transition-all hover:bg-slate-800 font-mono shadow-inner tracking-wide resize-none h-40"
                                 required
                             />
                         </div>
