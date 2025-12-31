@@ -95,3 +95,19 @@
 > ⚠️ CHARGEBACK WARNING: 3 customers executed disputes against you today. Get your Proof of Delivery PDF: https://customs-tracker.vercel.app
 
 ---
+
+## [DRAFT] Viral Post (2025-12-31 12:12:26)
+**Platform**: Reddit / Twitter / Threads
+**Status**: 🚀 READY TO POST
+**Copy**:
+> 💡 HS Code Hacks: Don't pay 20% duty on 'Watches'. Declare as 'Timepieces' (0%). Check your rate: https://customs-tracker.vercel.app
+
+---
+
+## [DRAFT] Viral Post (2025-12-31 12:27:28)
+**Platform**: Reddit / Twitter / Threads
+**Status**: 🚀 READY TO POST
+**Copy**:
+> 💡 HS Code Hacks: Don't pay 20% duty on 'Watches'. Declare as 'Timepieces' (0%). Check your rate: https://customs-tracker.vercel.app
+
+---

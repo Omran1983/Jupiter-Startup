@@ -33,3 +33,5 @@
 | 2025-12-31 11:27:20 | 🔥 BLASTING Quora Answers (Automated)... -> 📝 Generated Viral Content: '⚠️ CHARGEBACK WARNING: 3 custo...' |
 | 2025-12-31 11:42:23 | 🔥 EMAILING 100 Shopify Stores (Cold Outreach)... -> 📝 Generated Viral Content: '🔥 LEAKED: The exact email temp...' |
 | 2025-12-31 11:57:25 | 🔥 MASS DMing Instagram Influencers (SimonSq, EcomKing)... -> 📝 Generated Viral Content: '⚠️ CHARGEBACK WARNING: 3 custo...' |
+| 2025-12-31 12:12:26 | 🔥 MASS DMing Instagram Influencers (SimonSq, EcomKing)... -> 📝 Generated Viral Content: '💡 HS Code Hacks: Don't pay 20%...' |
+| 2025-12-31 12:27:28 | 🔥 SPAMMING Reddit r/dropshipping (Simulated)... -> 📝 Generated Viral Content: '💡 HS Code Hacks: Don't pay 20%...' |
