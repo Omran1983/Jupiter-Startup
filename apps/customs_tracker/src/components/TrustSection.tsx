@@ -11,7 +11,6 @@ export default function TrustSection() {
                     <span className="text-xl font-bold text-slate-300">Shopify</span>
                     <span className="text-xl font-bold text-slate-300">WooCommerce</span>
                     <span className="text-xl font-bold text-slate-300">PayPal</span>
-                    <span className="text-xl font-bold text-slate-300">Stripe</span>
                     <span className="text-xl font-bold text-slate-300">eBay</span>
                     <span className="text-xl font-bold text-slate-300">AliExpress</span>
                 </div>
