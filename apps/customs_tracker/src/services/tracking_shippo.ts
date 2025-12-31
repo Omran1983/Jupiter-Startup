@@ -1,28 +1,24 @@
 
+import shippo from "shippo";
 import { ITrackingService, TrackingResult } from "./tracking";
 
 export class ShippoTrackingService implements ITrackingService {
 
-    // Lazy Client Initializer to prevent Build-Time Crashes
     private getClient() {
-        const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY!;
-
-        // Dynamic Require to bypass Next.js Bundler aggressive pre-eval check for top-level vars
-        const shippoPkg = require("shippo");
-
-        // Handle strange bundling states (ESM vs CJS)
-        // If shippoPkg is a function, use it. If it has .default, use that.
-        const initShippo = typeof shippoPkg === 'function' ? shippoPkg : shippoPkg.default;
-
-        if (!initShippo || typeof initShippo !== 'function') {
-            // Fallback for extreme cases
-            if (shippoPkg && typeof shippoPkg.Client === 'function') return new shippoPkg.Client(SHIPPO_TOKEN);
-
-            console.error("[Shippo Init Error] Package Content:", shippoPkg);
-            throw new Error("Shippo library could not be initialized. Check console.");
+        const SHIPPO_TOKEN = process.env.SHIPPO_API_KEY;
+        if (!SHIPPO_TOKEN) {
+            console.error("Missing SHIPPO_API_KEY env var");
+            throw new Error("Tracking Service Misconfigured (Missing Credentials)");
         }
 
-        return initShippo(SHIPPO_TOKEN);
+        try {
+            // @ts-ignore - Check for default export behavior if types are weird
+            const client = shippo(SHIPPO_TOKEN);
+            return client;
+        } catch (e) {
+            console.error("Shippo Init Failed:", e);
+            throw new Error("Tracking API Initialization Failed");
+        }
     }
 
     // Helper to map allowed status strings
