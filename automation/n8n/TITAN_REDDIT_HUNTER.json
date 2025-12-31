@@ -1,0 +1,123 @@
+{
+    "name": "TITAN_REDDIT_HUNTER",
+    "nodes": [
+        {
+            "parameters": {
+                "url": "https://www.reddit.com/r/dropshipping/new.json",
+                "options": {}
+            },
+            "name": "Poll Reddit RSS",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "minutes",
+                            "minutes": 30
+                        }
+                    ]
+                }
+            },
+            "name": "Schedule (30m)",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "functionCode": "const items = $input.all();\nconst keywords = ['stuck', 'customs', 'delay', 'stripe', 'ban', 'lost'];\n\nreturn items[0].json.data.children.map(post => post.data).filter(post => {\n  const text = (post.title + ' ' + post.selftext).toLowerCase();\n  return keywords.some(k => text.includes(k));\n});"
+            },
+            "name": "Filter Keywords",
+            "type": "n8n-nodes-base.function",
+            "typeVersion": 1,
+            "position": [
+                450,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "modelId": "gpt-4",
+                "prompt": "You are a helpful logistics expert. A user posted: '{{$json[\"title\"]}}'. Write a short, 2-sentence comment helping them. Mention that 'Customs Tracker' (link: https://customs-tracker.vercel.app) can generate a PDF proof to win the dispute. Don't sound like a bot."
+            },
+            "name": "AI Draft Reply",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                650,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "operation": "append",
+                "documentId": "YOUR_SHEET_ID_HERE",
+                "sheetName": "Leads",
+                "fields": "Title,Link,AI_Draft"
+            },
+            "name": "Save to Google Sheets",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 1,
+            "position": [
+                850,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Schedule (30m)": {
+            "main": [
+                [
+                    {
+                        "node": "Poll Reddit RSS",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Poll Reddit RSS": {
+            "main": [
+                [
+                    {
+                        "node": "Filter Keywords",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Filter Keywords": {
+            "main": [
+                [
+                    {
+                        "node": "AI Draft Reply",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "AI Draft Reply": {
+            "main": [
+                [
+                    {
+                        "node": "Save to Google Sheets",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

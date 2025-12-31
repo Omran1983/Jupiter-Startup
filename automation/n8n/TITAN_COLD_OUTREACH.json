@@ -1,0 +1,103 @@
+{
+    "name": "TITAN_COLD_OUTREACH",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hours": 24
+                        }
+                    ]
+                }
+            },
+            "name": "Daily Pulse",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                100,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "documentId": "YOUR_SHEET_ID_HERE",
+                "sheetName": "Outreach_Targets",
+                "options": {}
+            },
+            "name": "Read Leads",
+            "type": "n8n-nodes-base.googleSheets",
+            "typeVersion": 2,
+            "position": [
+                300,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "modelId": "gpt-4",
+                "prompt": "You are a specialized sales assistant for 'Customs Tracker'. \n\nTarget: {{$json[\"Store_Name\"]}} \nContact: {{$json[\"Email\"]}} \nContext: They are a dropshipping store.\n\nTask: Write a short, punchy cold email.\nSubject: Something about 'Stripe Ban Risk' or 'Stuck Packages'.\nBody: \n1. Mention you scanned their site and saw long shipping times.\n2. Warn them about Q4 chargebacks.\n3. Pitch 'Customs Tracker' as the 'Evidence Engine' to win disputes.\n4. Link: https://customs-tracker.vercel.app\n\nCONSTRAINT: DO NOT say it is free. It is a premium tool. Focus on ROI (saving the merchant account).\nKeep it under 100 words."
+            },
+            "name": "Write Email",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                500,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "draft",
+                "subject": "={{$json.choices[0].message.content.split('\\n')[0].replace('Subject: ', '')}}",
+                "body": "={{$json.choices[0].message.content.split('\\n').slice(1).join('\\n')}}",
+                "to": {
+                    "value": "={{$node[\"Read Leads\"].json[\"Email\"]}}"
+                }
+            },
+            "name": "Gmail Draft",
+            "type": "n8n-nodes-base.gmail",
+            "typeVersion": 2,
+            "position": [
+                700,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Daily Pulse": {
+            "main": [
+                [
+                    {
+                        "node": "Read Leads",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Read Leads": {
+            "main": [
+                [
+                    {
+                        "node": "Write Email",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Write Email": {
+            "main": [
+                [
+                    {
+                        "node": "Gmail Draft",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}
