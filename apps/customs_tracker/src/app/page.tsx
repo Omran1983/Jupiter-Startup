@@ -43,6 +43,14 @@ export default function Home() {
                                     <option value="UPS">UPS (Global)</option>
                                     <option value="FedEx">FedEx (Express)</option>
                                     <option value="DHL">DHL (International)</option>
+                                    <option value="Royal Mail">Royal Mail (UK)</option>
+                                    <option value="China Post">China Post (Global)</option>
+                                    <option value="Yanwen">Yanwen (Logistics)</option>
+                                    <option value="YunExpress">YunExpress (Cross-Border)</option>
+                                    <option value="Cainiao">Cainiao (Alibaba)</option>
+                                    <option value="4PX">4PX Express</option>
+                                    <option value="Canada Post">Canada Post</option>
+                                    <option value="Australia Post">Australia Post</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 group-hover:text-blue-400 transition-colors">
                                     ▼
@@ -62,22 +70,15 @@ export default function Home() {
                         </div>
 
                         <div>
-                            <label className="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 ml-1">Destination</label>
+                            <label className="block text-xs font-bold text-blue-400 uppercase tracking-widest mb-2 ml-1">Destination Country</label>
                             <div className="relative group">
-                                <select
+                                <input
                                     name="destinationCountry"
-                                    aria-label="Select Destination Country"
-                                    className="w-full p-4 border border-slate-700/50 rounded-xl bg-slate-900/50 text-slate-200 outline-none appearance-none hover:bg-slate-800 transition-all focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-inner cursor-pointer"
-                                    defaultValue="US"
-                                >
-                                    <option value="US">🇺🇸 United States</option>
-                                    <option value="CA">🇨🇦 Canada</option>
-                                    <option value="GB">🇬🇧 United Kingdom</option>
-                                    <option value="AU">🇦🇺 Australia</option>
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 group-hover:text-blue-400 transition-colors">
-                                    ▼
-                                </div>
+                                    type="text"
+                                    placeholder="e.g. United States, United Kingdom..."
+                                    className="w-full p-4 border border-slate-700/50 rounded-xl bg-slate-900/50 text-slate-200 outline-none hover:bg-slate-800 transition-all focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 shadow-inner"
+                                    required
+                                />
                             </div>
                         </div>
 

@@ -58,7 +58,7 @@ export default function CarrierSideBar() {
                 </Link>
 
                 <div className="h-px w-8 bg-gray-500 my-2"></div>
-                <Link href="#" className="text-xs font-semibold text-blue-400 hover:text-white hover:underline whitespace-nowrap">
+                <Link href="/carriers" className="text-xs font-semibold text-blue-400 hover:text-white hover:underline whitespace-nowrap">
                     View All &rarr;
                 </Link>
             </div>

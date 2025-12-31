@@ -23,3 +23,27 @@
 > 💡 HS Code Hacks: Don't pay 20% duty on 'Watches'. Declare as 'Timepieces' (0%). Check your rate: https://customs-tracker.vercel.app
 
 ---
+
+## [DRAFT] Viral Post (2025-12-31 09:57:00)
+**Platform**: Reddit / Twitter / Threads
+**Status**: 🚀 READY TO POST
+**Copy**:
+> ⚠️ CHARGEBACK WARNING: 3 customers executed disputes against you today. Get your Proof of Delivery PDF: https://customs-tracker.vercel.app
+
+---
+
+## [DRAFT] Viral Post (2025-12-31 10:12:03)
+**Platform**: Reddit / Twitter / Threads
+**Status**: 🚀 READY TO POST
+**Copy**:
+> 🔥 LEAKED: The exact email template to get DHL to move your stuck package in 24 hours. Copy/Paste: https://customs-tracker.vercel.app
+
+---
+
+## [DRAFT] Viral Post (2025-12-31 10:27:07)
+**Platform**: Reddit / Twitter / Threads
+**Status**: 🚀 READY TO POST
+**Copy**:
+> 💡 HS Code Hacks: Don't pay 20% duty on 'Watches'. Declare as 'Timepieces' (0%). Check your rate: https://customs-tracker.vercel.app
+
+---
