@@ -20,9 +20,8 @@ interface RunContext {
 export async function processRun(context: RunContext) {
     console.log(`[Orchestrator] Starting Run ${context.runId}...`);
 
-    // 1. Init Services - Using PUBLIC API (no signup/key needed, REAL data)
-    const { PublicTrackingService } = await import("../services/tracking_public");
-    const tracker = new PublicTrackingService();
+    // 1. Init Services - Using Shippo Live API
+    const tracker = new ShippoTrackingService();
     const analyzer = new CustomsAnalyzer();
 
     // 2. Execute Tracking

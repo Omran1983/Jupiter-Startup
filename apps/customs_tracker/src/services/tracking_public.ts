@@ -1,142 +1,148 @@
 import { ITrackingService, TrackingResult } from "./tracking";
 
 /**
- * 17Track Public API - REAL tracking data, NO signup required
- * Uses their public endpoint (rate-limited but functional)
- * Supports 1000+ carriers worldwide
+ * Smart Fallback Tracking Service
+ * Generates realistic tracking data based on carrier patterns
+ * Perfect for MVP/demo until real API credentials are available
+ * 
+ * NOTE: This generates SIMULATED data for demonstration purposes
+ * Switch to real API (Shippo/AfterShip) for production use
  */
-export class PublicTrackingService implements ITrackingService {
-
-    private mapStatus(status: string): TrackingResult['status'] {
-        const s = status.toLowerCase();
-
-        if (s.includes("delivered")) return "delivered";
-        if (s.includes("exception") || s.includes("returned") || s.includes("failed")) return "exception";
-        if (s.includes("transit") || s.includes("departure") || s.includes("arrival")) return "transit";
-        if (s.includes("customs") || s.includes("held")) return "customs_hold";
-        if (s.includes("info") || s.includes("pending") || s.includes("registered")) return "pre_transit";
-
-        return "transit";
-    }
+export class SmartFallbackService implements ITrackingService {
 
     async getStatus(carrier: string, trackingNumber: string): Promise<TrackingResult> {
-        console.log(`[17Track] Tracking ${carrier} ${trackingNumber}`);
+        console.log(`[SmartFallback] Generating realistic data for ${carrier} ${trackingNumber}`);
 
-        try {
-            // Use 17track's public API endpoint
-            const res = await fetch('https://api.17track.net/track/v2.2/gettrackinfo', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify([{
-                    number: trackingNumber,
-                    carrier: this.mapCarrierCode(carrier)
-                }])
-            });
+        // Generate realistic tracking history
+        const history = this.generateRealisticHistory(carrier, trackingNumber);
+        const latest = history[0] || {};
 
-            if (!res.ok) {
-                throw new Error(`17Track API returned ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            if (!data.data || !data.data[0]) {
-                throw new Error("No tracking data found");
-            }
-
-            const track = data.data[0];
-            const events = track.track?.z || [];
-
-            // Map events to our format
-            const history = events.map((event: any) => ({
-                date: event.a || new Date().toISOString(),
-                status: event.z || "Unknown",
-                details: event.z || "",
-                location: event.c || ""
-            }));
-
-            const latest = history[0] || {};
-
-            return {
-                carrier: track.carrier || carrier,
-                trackingNumber,
-                status: this.mapStatus(latest.status || "pending"),
-                rawStatus: latest.details || "Processing",
-                location: latest.location || "Unknown",
-                estimatedDelivery: track.track?.w1 || undefined,
-                lastUpdated: latest.date || new Date().toISOString(),
-                history
-            };
-
-        } catch (error: any) {
-            console.error("17Track Error:", error);
-
-            // Fallback to intelligent mock if API fails
-            return this.generateIntelligentFallback(carrier, trackingNumber);
-        }
-    }
-
-    private mapCarrierCode(carrier: string): number {
-        // 17track carrier codes
-        const codes: Record<string, number> = {
-            'usps': 2003,
-            'ups': 2001,
-            'fedex': 2002,
-            'dhl': 2004,
-            'yanwen': 2097,
-            'china-post': 2006,
-            'china post': 2006,
-            '4px': 2098,
-            'cainiao': 2099,
-            'yunexpress': 2100,
-            'royal mail': 2005,
-            'canada post': 2007,
-            'australia post': 2008
-        };
-
-        return codes[carrier.toLowerCase()] || 0; // 0 = auto-detect
-    }
-
-    /**
-     * Intelligent fallback when API is unavailable
-     * Generates realistic data based on tracking number patterns
-     */
-    private generateIntelligentFallback(carrier: string, trackingNumber: string): TrackingResult {
-        const now = new Date();
-        const daysAgo = 7;
-
-        const history = [
-            {
-                date: new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000).toISOString(),
-                status: "INFO_RECEIVED",
-                details: "Shipment information received",
-                location: "Origin Facility"
-            },
-            {
-                date: new Date(now.getTime() - (daysAgo - 2) * 24 * 60 * 60 * 1000).toISOString(),
-                status: "IN_TRANSIT",
-                details: "Package in transit",
-                location: "Sorting Center"
-            },
-            {
-                date: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-                status: "IN_TRANSIT",
-                details: "Arrived at destination facility",
-                location: "Local Hub"
-            }
-        ];
+        // Calculate estimated delivery (3-7 days from now based on carrier)
+        const daysToDeliver = this.estimateDeliveryDays(carrier);
+        const estimatedDelivery = new Date(Date.now() + daysToDeliver * 24 * 60 * 60 * 1000)
+            .toISOString()
+            .split('T')[0];
 
         return {
             carrier,
             trackingNumber,
-            status: "transit",
-            rawStatus: "Package in transit (API fallback mode)",
-            location: "Local Hub",
-            estimatedDelivery: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-            lastUpdated: history[history.length - 1].date,
+            status: this.mapStatus(latest.status || "transit"),
+            rawStatus: latest.details || "Package in transit",
+            location: latest.location || "Regional Hub",
+            estimatedDelivery,
+            lastUpdated: latest.date || new Date().toISOString(),
             history
         };
+    }
+
+    private generateRealisticHistory(carrier: string, trackingNumber: string): any[] {
+        const now = new Date();
+        const isChina = ['yanwen', 'china-post', '4px', 'cainiao', 'yunexpress'].includes(carrier.toLowerCase());
+
+        // Determine package age based on tracking number (use last digits as seed)
+        const seed = parseInt(trackingNumber.slice(-4), 36) % 15;
+        const daysOld = 7 + seed; // 7-22 days old
+
+        const events = [];
+
+        // Event 1: Label created / Info received
+        events.push({
+            date: new Date(now.getTime() - daysOld * 24 * 60 * 60 * 1000).toISOString(),
+            status: "INFO_RECEIVED",
+            details: "Shipment information received",
+            location: isChina ? "Shenzhen, China" : "Origin Facility, US"
+        });
+
+        // Event 2: Picked up
+        events.push({
+            date: new Date(now.getTime() - (daysOld - 1) * 24 * 60 * 60 * 1000).toISOString(),
+            status: "IN_TRANSIT",
+            details: "Package picked up by carrier",
+            location: isChina ? "Shenzhen Sorting Center" : "Local Post Office"
+        });
+
+        if (isChina) {
+            // Event 3: Departed origin country
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 3) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "Departed from country of origin",
+                location: "Shanghai International Hub"
+            });
+
+            // Event 4: In transit (flight)
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 5) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "In transit to destination country",
+                location: "International Transit"
+            });
+
+            // Event 5: Arrived at destination
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 7) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "Arrived at destination country",
+                location: "Los Angeles ISC"
+            });
+
+            // Event 6: Customs processing
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 9) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "Customs clearance processing",
+                location: "Los Angeles ISC"
+            });
+
+            // Event 7: Cleared customs
+            events.push({
+                date: new Date(now.getTime() - (daysOld - 10) * 24 * 60 * 60 * 1000).toISOString(),
+                status: "IN_TRANSIT",
+                details: "Cleared customs",
+                location: "Los Angeles ISC"
+            });
+        }
+
+        // Event: Arrived at regional facility
+        events.push({
+            date: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            status: "IN_TRANSIT",
+            details: "Arrived at regional facility",
+            location: "Regional Distribution Center"
+        });
+
+        // Event: Out for delivery or in transit
+        events.push({
+            date: new Date(now.getTime() - 12 * 60 * 60 * 1000).toISOString(),
+            status: "IN_TRANSIT",
+            details: "In transit to local facility",
+            location: "Local Hub"
+        });
+
+        return events.reverse(); // Most recent first
+    }
+
+    private estimateDeliveryDays(carrier: string): number {
+        const estimates: Record<string, number> = {
+            'yanwen': 5,
+            'china-post': 6,
+            '4px': 4,
+            'cainiao': 5,
+            'yunexpress': 4,
+            'usps': 3,
+            'ups': 2,
+            'fedex': 2,
+            'dhl': 2
+        };
+        return estimates[carrier.toLowerCase()] || 4;
+    }
+
+    private mapStatus(status: string): TrackingResult['status'] {
+        const s = status.toLowerCase();
+        if (s.includes("delivered")) return "delivered";
+        if (s.includes("exception") || s.includes("returned")) return "exception";
+        if (s.includes("customs") || s.includes("held")) return "customs_hold";
+        if (s.includes("info") || s.includes("pending")) return "pre_transit";
+        return "transit";
     }
 }
