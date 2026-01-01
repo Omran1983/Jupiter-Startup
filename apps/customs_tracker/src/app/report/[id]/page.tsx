@@ -77,11 +77,24 @@ export default async function ReportPage(props: {
 
     if (!report) {
         return (
-            <div className="w-full max-w-2xl p-6 bg-red-50 border border-red-200 rounded-xl text-center">
-                <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-red-900">Tracking Failed</h2>
-                <p className="text-red-700 mb-4">We could not retrieve data for <b>{searchParams.tracking}</b> via {searchParams.carrier}.</p>
-                <a href="/" className="text-sm font-bold text-red-600 hover:underline">Try Another Number</a>
+            <div className="w-full max-w-2xl p-8 bg-gray-50 border border-gray-200 rounded-xl text-center space-y-4">
+                <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                    <AlertTriangle className="w-8 h-8 text-gray-400" />
+                </div>
+                <div>
+                    <h2 className="text-xl font-bold text-gray-900">Report Not Found</h2>
+                    <p className="text-gray-600 max-w-sm mx-auto mt-2">
+                        We couldn't retrieve this specific report. It may have expired or the link is incomplete.
+                    </p>
+                </div>
+                <div className="pt-2">
+                    <a
+                        href="/"
+                        className="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 text-white font-bold hover:bg-blue-700 transition w-full sm:w-auto"
+                    >
+                        Start New Search
+                    </a>
+                </div>
             </div>
         );
     }
