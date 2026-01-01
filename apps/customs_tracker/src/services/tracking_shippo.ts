@@ -82,7 +82,11 @@ export class ShippoTrackingService implements ITrackingService {
             // 1. Try Recommended First logic
             const userSelectionMatchesRecommendation = recommendedCarriers.includes(carrier.toLowerCase());
 
-            if (userSelectionMatchesRecommendation) {
+            // BYPASS: Shippo Account does not support Yanwen/SkyNet. Skip API to save time/errors.
+            if (['yanwen', 'skynet'].includes(carrier.toLowerCase())) {
+                console.log(`[Shippo] Carrier ${carrier} not supported by account. Using internal simulation directly.`);
+                track = null; // Force fallback
+            } else if (userSelectionMatchesRecommendation) {
                 // Trust user + heuristics
                 track = await fetchShippo(carrier, trackingNumber);
             } else {
