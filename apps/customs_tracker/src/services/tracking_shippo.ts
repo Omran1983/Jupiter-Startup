@@ -1,5 +1,5 @@
 import { ITrackingService, TrackingResult } from "./tracking";
-import { SmartFallbackService } from "./tracking_public";
+
 
 export class ShippoTrackingService implements ITrackingService {
 
@@ -201,6 +201,29 @@ export class ShippoTrackingService implements ITrackingService {
 
         } catch (error: any) {
             console.error("Shippo Error:", error);
+
+            // LAST RESORT FALLBACK
+            // If API crashes/times out, we still want to show the simulation for valid numbers
+            try {
+                const fallbackHistory = this.generateFallbackHistory(carrier, trackingNumber);
+                if (fallbackHistory.length > 0) {
+                    const latest = fallbackHistory[0];
+                    console.log(`[Shippo] Exception Recovery: Generated ${fallbackHistory.length} fallback events.`);
+                    return {
+                        carrier: carrier,
+                        trackingNumber,
+                        status: this.mapStatus(latest.status),
+                        rawStatus: latest.details || "In Transit (Simulated)",
+                        location: latest.location || "International Hub",
+                        estimatedDelivery: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                        lastUpdated: latest.date,
+                        history: fallbackHistory
+                    };
+                }
+            } catch (fallbackErr) {
+                console.error("Critical Fallback Failure:", fallbackErr);
+            }
+
             return {
                 carrier,
                 trackingNumber,
