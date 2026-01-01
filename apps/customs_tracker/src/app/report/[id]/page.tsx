@@ -3,6 +3,8 @@ import { CustomsAnalyzer } from "@/services/analyzer";
 import { AlertTriangle, CheckCircle, Clock, Copy, Lock } from "lucide-react";
 import DownloadEvidenceButton from "@/components/DownloadEvidenceButton";
 
+export const dynamic = 'force-dynamic';
+
 // In real app, we fetch from DB. For now, we re-run logic.
 async function getReport(carrier: string, trackingNumber: string, country: string) {
     // try {

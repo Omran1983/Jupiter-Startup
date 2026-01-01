@@ -216,7 +216,9 @@ export class ShippoTrackingService implements ITrackingService {
     private generateFallbackHistory(carrier: string, trackingNumber: string): any[] {
         const now = new Date();
         const isChina = ['yanwen', 'china-post', '4px', 'cainiao', 'yunexpress'].includes(carrier.toLowerCase());
-        const isYanwenSpecial = trackingNumber.startsWith("710") && carrier.toLowerCase().includes("yanwen");
+
+        // RELAXED CHECK: If it looks like a Yanwen 710 number, treat it as such regardless of carrier string
+        const isYanwenSpecial = trackingNumber.startsWith("710");
 
         let seed = 5;
         try { seed = parseInt(trackingNumber.slice(-4), 10) % 15; } catch (e) { }
