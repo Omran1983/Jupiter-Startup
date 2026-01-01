@@ -87,17 +87,19 @@ export default async function ReportPage(props: {
     }
     const isPaid = searchParams.paid === "true"; // Mock Payment Check
 
+    const severityKey = (report.severity || "low") as "low" | "medium" | "high";
+
     const severityColor = {
         low: "bg-green-100 text-green-800 border-green-200",
         medium: "bg-yellow-100 text-yellow-800 border-yellow-200",
         high: "bg-red-100 text-red-800 border-red-200",
-    }[report.severity];
+    }[severityKey];
 
     const Icon = {
         low: CheckCircle,
         medium: Clock,
         high: AlertTriangle
-    }[report.severity];
+    }[severityKey];
 
     return (
         <div className="w-full max-w-2xl space-y-6 animate-in fade-in duration-500">
@@ -164,7 +166,7 @@ export default async function ReportPage(props: {
             <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm relative overflow-hidden">
                 <h3 className="font-bold text-gray-900 mb-4">Action Plan</h3>
                 <ul className="space-y-3">
-                    {report.actionItems.map((item, i) => (
+                    {report.actionItems.map((item: string, i: number) => (
                         <li key={i} className="flex gap-3 text-gray-700">
                             <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">
                                 {i + 1}
