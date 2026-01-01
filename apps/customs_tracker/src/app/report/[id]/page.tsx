@@ -44,17 +44,28 @@ export default async function ReportPage(props: {
 
                 const { data, error } = await supabase
                     .from("runs")
-                    .select("output_summary")
+                    .select("output_summary, input_payload")
                     .eq("id", id)
                     .single();
 
-                if (data && data.output_summary) {
-                    // Map DB format to Page format
-                    report = {
-                        ...data.output_summary.analysis,
-                        rawData: data.output_summary.tracking
-                    };
-                    isFromDb = true;
+                if (data) {
+                    const storedHistory = data.output_summary?.tracking?.history || [];
+
+                    if (storedHistory.length > 0) {
+                        // HAPPY PATH: Cache is good
+                        report = {
+                            ...data.output_summary.analysis,
+                            rawData: data.output_summary.tracking
+                        };
+                        isFromDb = true;
+                    } else if (data.input_payload) {
+                        // SELF-HEALING: Cache is empty (from outage), but we have inputs. Re-Run!
+                        console.log(`[Self-Heal] Re-running empty report ${id}...`);
+                        const { carrier, trackingNumber, destinationCountry } = data.input_payload;
+
+                        // Force a fresh run
+                        report = await getReport(carrier, trackingNumber, destinationCountry);
+                    }
                 }
             }
         }
