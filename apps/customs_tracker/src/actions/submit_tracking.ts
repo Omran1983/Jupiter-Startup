@@ -38,7 +38,15 @@ export async function submitTracking(formData: FormData) {
             runId,
             input: validation.data
         });
-        redirect(`/report/${runId}`);
+
+        // ROBUST FIX: Pass params in URL ("Stateless Mode") so page renders even if DB Insert failed.
+        const params = new URLSearchParams({
+            carrier: carrier,
+            tracking: trackingNumbers[0],
+            country: destinationCountry
+        });
+
+        redirect(`/report/${runId}?${params.toString()}`);
     }
 
     // PATH 2: Bulk Tracking (Batch Flow)
