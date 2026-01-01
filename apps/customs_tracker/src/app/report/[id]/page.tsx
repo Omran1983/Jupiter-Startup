@@ -26,10 +26,41 @@ export default async function ReportPage(props: {
 }) {
     const searchParams = await props.searchParams;
     let report;
+    let isFromDb = false;
+
     try {
-        report = await getReport(searchParams.carrier, searchParams.tracking, searchParams.country);
+        if (searchParams.carrier && searchParams.tracking) {
+            // A. STATELESS MODE: Live re-run
+            report = await getReport(searchParams.carrier, searchParams.tracking, searchParams.country);
+        } else {
+            // B. STATEFUL MODE: Fetch from DB (Clean URL support)
+            const { createClient } = await import("@supabase/supabase-js");
+            const sbUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+            const sbKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+
+            if (sbUrl && sbKey) {
+                const supabase = createClient(sbUrl, sbKey);
+                const id = (await props.params).id;
+
+                const { data, error } = await supabase
+                    .from("runs")
+                    .select("output_summary")
+                    .eq("id", id)
+                    .single();
+
+                if (data && data.output_summary) {
+                    // Map DB format to Page format
+                    report = {
+                        ...data.output_summary.analysis,
+                        rawData: data.output_summary.tracking
+                    };
+                    isFromDb = true;
+                }
+            }
+        }
     } catch (e) {
         // Fallback for demo/invalid numbers
+        console.error("Report Load Error:", e);
         report = null;
     }
 
