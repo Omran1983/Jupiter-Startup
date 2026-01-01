@@ -44,21 +44,31 @@ export class ShippoTrackingService implements ITrackingService {
 
         // Use direct Fetch to avoid SDK headaches
         const fetchShippo = async (c: string, t: string) => {
-            const url = `https://api.goshippo.com/tracks/${c}/${t}`;
-            const res = await fetch(url, {
-                headers: {
-                    "Authorization": `ShippoToken ${SHIPPO_TOKEN.trim()}`,
-                    "Content-Type": "application/json"
-                },
-                // Crucial: Bypass Next.js Cache for real-time tracking
-                cache: "no-store",
-            });
-            if (!res.ok) {
-                // Log failed attempts for debugging (optional)
-                // console.log(`[Shippo] Failed ${c}/${t}: ${res.status}`);
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000); // 4s Timeout per call
+
+            try {
+                const url = `https://api.goshippo.com/tracks/${c}/${t}`;
+                const res = await fetch(url, {
+                    headers: {
+                        "Authorization": `ShippoToken ${SHIPPO_TOKEN.trim()}`,
+                        "Content-Type": "application/json"
+                    },
+                    // Crucial: Bypass Next.js Cache for real-time tracking
+                    cache: "no-store",
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                if (!res.ok) {
+                    return null;
+                }
+                return await res.json();
+            } catch (error) {
+                clearTimeout(timeoutId);
+                // console.log(`[Shippo] Fetch Error ${c}:`, error);
                 return null;
             }
-            return await res.json();
         };
 
         try {
@@ -70,20 +80,16 @@ export class ShippoTrackingService implements ITrackingService {
             let finalCarrier = carrier;
 
             // 1. Try Recommended First logic
-            // If the user's selected carrier is in the recommended list, try that specific one first
-            // Otherwise, start from the top of the recommended list
-
             const userSelectionMatchesRecommendation = recommendedCarriers.includes(carrier.toLowerCase());
 
             if (userSelectionMatchesRecommendation) {
                 // Trust user + heuristics
                 track = await fetchShippo(carrier, trackingNumber);
             } else {
-                // User might be wrong (e.g. tracking Yanwen number as USPS)
-                // Or we might be wrong.
-                // Strategy: Try the top Recommended Carrier first (likely correct), then fallback to User's choice.
+                // User might be wrong. Try recommended first.
                 console.log(`[Shippo] Auto-Detect suggests ${recommendedCarriers[0]} instead of ${carrier}`);
                 track = await fetchShippo(recommendedCarriers[0], trackingNumber);
+
                 if (track && track.tracking_history && track.tracking_history.length > 0) {
                     finalCarrier = recommendedCarriers[0];
                 } else {
@@ -92,21 +98,34 @@ export class ShippoTrackingService implements ITrackingService {
                 }
             }
 
-            // 3. Deep Scan / Fallback (Smart Mode) if still empty
+            // 3. Deep Scan (Parallelized) if still empty
             if (!track || !track.tracking_history || track.tracking_history.length === 0) {
-                console.log("[Shippo] Scan Empty. Trying Smart Fallbacks...");
+                console.log("[Shippo] Scan Empty. Deep Scanning specific carriers in parallel...");
 
-                for (const fallback of recommendedCarriers) {
-                    if (fallback === finalCarrier.toLowerCase()) continue;
-                    try {
-                        const deepTrack = await fetchShippo(fallback, trackingNumber);
-                        if (deepTrack && deepTrack.tracking_history && deepTrack.tracking_history.length > 0) {
-                            console.log(`[Shippo] Match via ${fallback}!`);
-                            track = deepTrack;
-                            finalCarrier = fallback;
-                            break;
+                // Only scan carriers we haven't tried yet
+                const carriersToScan = recommendedCarriers.filter(c => c !== finalCarrier.toLowerCase());
+
+                if (carriersToScan.length > 0) {
+                    // Launch all requests in parallel
+                    const promises = carriersToScan.map(async (c) => {
+                        const res = await fetchShippo(c, trackingNumber);
+                        return { carrier: c, result: res };
+                    });
+
+                    const results = await Promise.allSettled(promises);
+
+                    // Find first successful result with history
+                    for (const outcome of results) {
+                        if (outcome.status === 'fulfilled' && outcome.value.result) {
+                            const { carrier: scanCarrier, result: scanResult } = outcome.value;
+                            if (scanResult.tracking_history && scanResult.tracking_history.length > 0) {
+                                console.log(`[Shippo] Match via ${scanCarrier}!`);
+                                track = scanResult;
+                                finalCarrier = scanCarrier;
+                                break; // Stop after first match
+                            }
                         }
-                    } catch (ignore) { }
+                    }
                 }
             }
 
