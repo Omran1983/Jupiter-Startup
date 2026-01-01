@@ -1,4 +1,5 @@
 import { ITrackingService, TrackingResult } from "./tracking";
+import { SmartFallbackService } from "./tracking_public";
 
 export class ShippoTrackingService implements ITrackingService {
 
@@ -118,8 +119,6 @@ export class ShippoTrackingService implements ITrackingService {
             if (noData || (isDeepScan && hasLimitedData)) {
                 console.log(`[Shippo] Limited/No data (${track?.tracking_history?.length || 0} events). Falling back to Public Service for ${carrier}...`);
                 try {
-                    // Lazy load to avoid circular dependency issues if any
-                    const { SmartFallbackService } = await import("./tracking_public");
                     const publicTracker = new SmartFallbackService();
                     const publicResult = await publicTracker.getStatus(carrier, trackingNumber);
 
