@@ -4,16 +4,6 @@ import { Shield, FileText, Lock } from "lucide-react";
 import Link from "next/link";
 import { trackEvent } from "../actions/track_event";
 
-// ... inside component ...
-
-<Link
-    href={pack.link}
-    onClick={() => trackEvent('checkout_click', { pack: pack.id, price: pack.price })}
-    className={`block w-full py-3 rounded-xl font-bold text-center text-white transition-all shadow-lg active:scale-[0.98] ${pack.btnColor}`}
->
-    Get Protection
-</Link>
-
 const PACKS = [
     {
         id: "starter",
@@ -114,6 +104,7 @@ export function BuyCredits() {
 
                         <Link
                             href={pack.link}
+                            onClick={() => trackEvent('checkout_click', { pack: pack.id, price: pack.price })}
                             className={`block w-full py-3 rounded-xl font-bold text-center text-white transition-all shadow-lg active:scale-[0.98] ${pack.btnColor}`}
                         >
                             Get Protection
