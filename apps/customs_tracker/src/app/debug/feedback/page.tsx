@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { runDiagnostics } from "@/actions/debug_feedback";
+import { runDiagnostics } from "../../../actions/debug_feedback";
 
 export default function FeedbackDebugPage() {
     const [result, setResult] = useState<any>(null);
