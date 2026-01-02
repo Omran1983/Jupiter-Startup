@@ -15,7 +15,7 @@ export default function ChargebackShieldPost() {
                     <Link href="/blog" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Intelligence
                     </Link>
-                    <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500">
+                    <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500" aria-label="Share article">
                         <Share2 className="w-5 h-5" />
                     </button>
                 </div>
