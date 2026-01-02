@@ -105,7 +105,7 @@ export async function GET() {
     doc.setFontSize(12);
     doc.text("Use Customs Tracker Intelligence to automatically Audit these points.", 30, 145);
     doc.setFontSize(10);
-    doc.text(">> Access real-time reports at: https://customstracker.com", 30, 155);
+    doc.text(">> Access real-time reports: Log in to your Dashboard", 30, 155);
 
     // Footer
     doc.setFontSize(8);
