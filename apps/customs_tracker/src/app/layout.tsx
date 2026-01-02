@@ -31,6 +31,14 @@ export default function RootLayout({
                     </main>
                     <footer className="p-8 text-center border-t border-slate-800 w-full mt-8 bg-slate-900/50 backdrop-blur-sm">
                         <div className="flex flex-col gap-2 text-sm text-slate-500">
+                            {/* Content Network Links */}
+                            <div className="flex flex-wrap justify-center gap-6 mb-8 text-xs font-bold uppercase tracking-wider text-slate-400">
+                                <a href="/blog/dark-handover" className="hover:text-amber-400 transition-colors">The Dark Handover</a>
+                                <a href="/blog/chargeback-shield" className="hover:text-blue-400 transition-colors">Chargeback Shield</a>
+                                <a href="/blog/risk-scores" className="hover:text-red-400 transition-colors">Risk Scores</a>
+                                <a href="/blog" className="hover:text-white transition-colors">All Intelligence →</a>
+                            </div>
+
                             <p className="font-semibold cursor-help hover:text-slate-300 transition-colors" title="Registered in Republic of Mauritius">Operated by A-One Global Resourcing Ltd</p>
                             <p className="text-xs opacity-60">BRN: C22185206 | TAN: 28006142</p>
                             <p className="text-xs opacity-60 hover:text-blue-400 transition-colors">deals@aogrl.com | +230 5788 7132</p>
