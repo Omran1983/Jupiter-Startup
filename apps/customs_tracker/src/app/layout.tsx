@@ -43,7 +43,7 @@ export default function RootLayout({
                             <p className="text-xs opacity-60">BRN: C22185206 | TAN: 28006142</p>
                             <p className="text-xs opacity-60 hover:text-blue-400 transition-colors">deals@aogrl.com | +230 5788 7132</p>
                             <p className="text-[10px] text-slate-600 mt-4 uppercase tracking-wider">
-                                Operational guidance only. Not legal advice.
+                                Operational guidance only. Not legal advice. • <a href="/admin/feedback" className="hover:text-slate-400 transition-colors">Admin Login</a>
                             </p>
                         </div>
                     </footer>
