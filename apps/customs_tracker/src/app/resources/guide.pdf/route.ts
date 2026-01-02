@@ -1,5 +1,6 @@
 import { jsPDF } from "jspdf";
 import { NextResponse } from "next/server";
+import { trackEvent } from "../../../actions/track_event";
 
 export async function GET() {
     const doc = new jsPDF();
@@ -113,6 +114,9 @@ export async function GET() {
     doc.text("Copyright © 2026 Customs Tracker Intelligence. Confidential & Proprietary.", 105, 280, { align: "center" });
 
     const pdfBuffer = doc.output("arraybuffer");
+
+    // Track the event (fire and forget)
+    trackEvent('report_generated', { type: 'anti_dispute_guide' });
 
     return new NextResponse(pdfBuffer, {
         headers: {
