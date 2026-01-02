@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, X, FileText, AlertTriangle } from "lucide-react";
-import { createClient } from "@/utils/supabase/client";
+import { submitFeedback } from "@/actions/submit_feedback";
 
 export function FeedbackWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -14,18 +14,31 @@ export function FeedbackWidget() {
     const handleSubmit = async () => {
         if (!comment || !email) return;
         setLoading(true);
-        const supabase = createClient();
-        await supabase.from("feedback").insert({
-            rating: 1, // Defaulting to 1 (Problem Report)
-            comment: `(Lead Magnet) ${comment}`,
-            email
-        });
-        setLoading(false);
-        setStep("success");
-        setTimeout(() => {
-            setIsOpen(false);
-            setStep("initial");
-        }, 3000);
+
+        try {
+            // Use Server Action (Bypasses RLS)
+            const { success, error } = await submitFeedback(comment, email);
+
+            if (!success) {
+                console.error("Feedback Submission Failed:", error);
+                alert("Could not submit feedback. Please try again.");
+                setLoading(false);
+                return;
+            }
+
+            setStep("success");
+            setTimeout(() => {
+                setIsOpen(false);
+                setStep("initial");
+                setComment("");
+                setEmail("");
+            }, 3000);
+        } catch (err) {
+            console.error(err);
+            alert("Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     // 1. Minimized State (Value Hook)
