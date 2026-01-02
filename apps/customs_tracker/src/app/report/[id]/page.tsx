@@ -1,6 +1,7 @@
 import { ShippoTrackingService } from "@/services/tracking_shippo";
 import { CustomsAnalyzer } from "@/services/analyzer";
 import { AlertTriangle, CheckCircle, Clock, Copy, Lock } from "lucide-react";
+import Link from "next/link";
 import DownloadEvidenceButton from "@/components/DownloadEvidenceButton";
 
 export const dynamic = 'force-dynamic';
@@ -76,10 +77,6 @@ export default async function ReportPage(props: {
     }
 
     if (!report) {
-        // DEBUG: Check which key is being used (Safe)
-        const usingServiceKey = !!process.env.SUPABASE_SERVICE_ROLE_KEY;
-        const debugInfo = usingServiceKey ? "Service Role (Correct)" : "Anon Key (WRONG - RLS Blocked)";
-
         return (
             <div className="w-full max-w-2xl p-8 bg-gray-50 border border-gray-200 rounded-xl text-center space-y-4">
                 <div className="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
@@ -90,12 +87,6 @@ export default async function ReportPage(props: {
                     <p className="text-gray-600 max-w-sm mx-auto mt-2">
                         We couldn't retrieve this specific report. It may have expired or the link is incomplete.
                     </p>
-                    <div className="mt-4 p-3 bg-white border border-gray-200 rounded text-xs font-mono text-left text-gray-500 overflow-auto">
-                        <p className="font-bold text-gray-800 mb-1">Diagnosis Info:</p>
-                        <p>ID: {(await props.params).id}</p>
-                        <p>Key Mode: <span className={usingServiceKey ? "text-green-600 font-bold" : "text-red-600 font-bold"}>{debugInfo}</span></p>
-                        <p>Timestamp: {new Date().toISOString()}</p>
-                    </div>
                 </div>
                 <div className="pt-2">
                     <a
@@ -238,12 +229,13 @@ export default async function ReportPage(props: {
                                 <p className="text-sm text-gray-600 max-w-xs mb-4">
                                     Don't say the wrong thing and trigger a chargeback. Get the exact template tailored to this status.
                                 </p>
-                                <a
-                                    href={`/report/${(await props.params).id}?carrier=${searchParams.carrier}&tracking=${searchParams.tracking}&country=${searchParams.country}&paid=true`}
-                                    className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg shadow-lg hover:bg-blue-700 transition-transform active:scale-95 flex items-center gap-2"
+                                <Link
+                                    href="/checkout?pack=starter"
+                                    className="px-6 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-900 border border-amber-500 font-bold rounded-lg shadow-lg hover:shadow-amber-500/20 transition-transform active:scale-95 flex items-center gap-2"
                                 >
-                                    Unlock for $9 (Simulated)
-                                </a>
+                                    <Lock className="w-5 h-5 text-slate-900" />
+                                    Unlock Official Report ($5)
+                                </Link>
                                 <p className="text-xs text-gray-400 mt-2">One-time fee. 100% Guarantee.</p>
                             </div>
                         </div>

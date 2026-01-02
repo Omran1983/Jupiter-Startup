@@ -278,7 +278,7 @@ export class ShippoTrackingService implements ITrackingService {
                 events.push({
                     date: new Date(now.getTime() - (daysOld - 2) * 24 * 60 * 60 * 1000).toISOString(),
                     status: "TRANSIT",
-                    details: "Booking Arranged (已揽收)",
+                    details: "Booking Arranged",
                     location: "Yanwen Facility, China"
                 });
             }
@@ -286,7 +286,7 @@ export class ShippoTrackingService implements ITrackingService {
                 events.push({
                     date: new Date(now.getTime() - (daysOld - 2.5) * 24 * 60 * 60 * 1000).toISOString(),
                     status: "TRANSIT",
-                    details: "Documentation Prepared (转运中已发货)",
+                    details: "Documentation Prepared",
                     location: "Yanwen Facility, China"
                 });
             }

@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import { ArrowLeft, Share2 } from "lucide-react";
 
@@ -15,7 +16,11 @@ export default function ChargebackShieldPost() {
                     <Link href="/blog" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Intelligence
                     </Link>
-                    <button className="p-2 hover:bg-gray-100 rounded-full text-gray-500" aria-label="Share article">
+                    <button
+                        className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
+                        aria-label="Share article"
+                        onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent("How to Win 'Item Not Received' Disputes with Better Evidence")}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`, '_blank')}
+                    >
                         <Share2 className="w-5 h-5" />
                     </button>
                 </div>
