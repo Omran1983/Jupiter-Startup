@@ -21,18 +21,24 @@ export function FeedbackWidget() {
 
             if (!success) {
                 console.error("Feedback Submission Failed:", error);
-                alert("Could not submit feedback. Please try again.");
+                alert(`Feedback Failed: ${error}`);
                 setLoading(false);
                 return;
             }
 
             setStep("success");
+
+            // Auto-trigger download
+            if (typeof window !== "undefined") {
+                window.open("/resources/guide.pdf", "_blank");
+            }
+
             setTimeout(() => {
                 setIsOpen(false);
                 setStep("initial");
                 setComment("");
                 setEmail("");
-            }, 3000);
+            }, 6000);
         } catch (err) {
             console.error(err);
             alert("Something went wrong.");
@@ -127,8 +133,15 @@ export function FeedbackWidget() {
                             <div className="w-12 h-12 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-green-500/20">
                                 <Send className="w-6 h-6 text-green-400" />
                             </div>
-                            <h3 className="text-sm font-bold text-white mb-1">Check your Inbox!</h3>
-                            <p className="text-xs text-slate-500">The guide is on its way.</p>
+                            <h3 className="text-sm font-bold text-white mb-2">Unlocked!</h3>
+                            <a
+                                href="/resources/guide.pdf"
+                                target="_blank"
+                                className="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg text-xs font-bold hover:bg-gray-100 transition-colors"
+                            >
+                                Download PDF Now
+                            </a>
+                            <p className="text-[10px] text-slate-500 mt-2">Check your email for a backup copy.</p>
                         </div>
                     )}
                 </div>
