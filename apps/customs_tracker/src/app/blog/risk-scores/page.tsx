@@ -1,6 +1,6 @@
-"use client";
 import Link from "next/link";
-import { ArrowLeft, Share2, AlertTriangle } from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
+import { ShareButton } from "@/components/blog/ShareButton";
 
 export const metadata = {
     title: "HS Code Risk Scores | Customs Tracker",
@@ -16,13 +16,7 @@ export default function RiskScoresPost() {
                     <Link href="/blog" className="flex items-center text-sm font-medium text-gray-500 hover:text-gray-900">
                         <ArrowLeft className="w-4 h-4 mr-2" /> Back to Intelligence
                     </Link>
-                    <button
-                        className="p-2 hover:bg-gray-100 rounded-full text-gray-500 transition-colors"
-                        aria-label="Share article"
-                        onClick={() => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent("Does Your HS Code Flag You for Inspection?")}&url=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`, '_blank')}
-                    >
-                        <Share2 className="w-5 h-5" />
-                    </button>
+                    <ShareButton title="Does Your HS Code Flag You for Inspection?" />
                 </div>
             </div>
 
