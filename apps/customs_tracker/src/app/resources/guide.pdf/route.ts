@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 import { NextResponse } from "next/server";
-import { trackEvent } from "../../../actions/track_event";
+import { trackEvent } from "@/actions/track_event";
 
 export async function GET() {
     const doc = new jsPDF();

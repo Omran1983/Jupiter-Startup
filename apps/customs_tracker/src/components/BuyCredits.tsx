@@ -2,7 +2,7 @@
 
 import { Shield, FileText, Lock } from "lucide-react";
 import Link from "next/link";
-import { trackEvent } from "../actions/track_event";
+import { trackEvent } from "@/actions/track_event";
 
 const PACKS = [
     {
