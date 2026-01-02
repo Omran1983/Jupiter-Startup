@@ -40,8 +40,11 @@ export async function GET() {
     doc.text("CRITICAL MISTAKE:", 25, 115);
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(11);
-    doc.text("Submitting a tracking link that shows 'Label Created' or 'Handed Over' for more than 5 days. This signals 'Lost' to the arbitrator.", 25, 122);
-    doc.text("SOLUTION: Use Customs Tracker to generate a 'Customs Hold' certificate.", 25, 132);
+    const mistakeText = "Submitting a tracking link that shows 'Label Created' or 'Handed Over' for more than 5 days. This signals 'Lost' to the arbitrator.";
+    doc.text(doc.splitTextToSize(mistakeText, 160), 25, 122);
+
+    const solutionText = "SOLUTION: Use Customs Tracker to generate a 'Customs Hold' certificate.";
+    doc.text(doc.splitTextToSize(solutionText, 160), 25, 132);
 
     // PAGE 2: TEMPLATES
     doc.setFontSize(16);
