@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Send, X, FileText, AlertTriangle } from "lucide-react";
-import { submitFeedback } from "@/actions/submit_feedback";
+import { submitFeedbackAction } from "@/actions/submit_feedback";
 
 export function FeedbackWidget() {
     const [isOpen, setIsOpen] = useState(false);
@@ -17,7 +17,7 @@ export function FeedbackWidget() {
 
         try {
             // Use Server Action (Bypasses RLS)
-            const { success, error } = await submitFeedback(comment, email);
+            const { success, error } = await submitFeedbackAction(comment, email);
 
             if (!success) {
                 console.error("Feedback Submission Failed:", error);
